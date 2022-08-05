@@ -129,6 +129,5 @@ skin.pressed = "./assets/UI/play_button_press.png";
 
 var button = new UIButton();
 button.skin;
-button.SetVisible(false);
 
 UIButton.prototype = button;

@@ -24,10 +24,41 @@ module.exports = {
   },
   target: 'web',
 
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+
   module: {
     rules: [
-      // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-      { test: /\.tsx?$/, loader: "ts-loader" }
+      {
+        // Now we apply rule for static files
+        test: /\.(png|jpe?g|gif|svg|woff|woff2|eot|ttf|otf|mp3|ogg|mp4)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]',
+          context: 'public',
+        },
+      },
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.js$/,
+        include: [path.resolve(__dirname, 'src')],
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                modules: false,
+              },
+            ],
+          ],
+        }
+      }
     ],
   },
 

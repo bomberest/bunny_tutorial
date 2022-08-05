@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { UIButton } from './Engine/Engine';
+import * as Engine from './Engine/UI';
 
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {
@@ -27,11 +27,13 @@ document.body.appendChild(app.view);
 
 const bunny = "bunny";
 
-// let playButton =  UIButton.prototype.Copy();
-// var skin = playButton.skin;
-// skin.normal = "./assets/UI/play_button_active.png";
-// skin.hover = "./assets/UI/play_button_hover.png";
-// skin.pressed = "./assets/UI/play_button_press.png";
+let playButton =  Engine.UIButton.prototype.Copy();
+var skin = playButton.skin;
+skin.normal = "./assets/UI/play_button_active.png";
+skin.hover = "./assets/UI/play_button_hover.png";
+skin.pressed = "./assets/UI/play_button_press.png";
+
+app.stage.addChild(playButton);
 
 loader
     .add(bunny, "./assets/mi_bunny_idle_03.png")
