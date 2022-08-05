@@ -19,7 +19,7 @@ module.exports = {
      * the js file will generated after webpack build the project, and the js will inserted at index.html automatically.
      * [hash:8] means unique 8 digit hash generated everytime.
      **/
-    filename: 'game.min.[fullhash].js',
+    filename: 'game.[hash].js',
     clean: true
   },
   target: 'web',
