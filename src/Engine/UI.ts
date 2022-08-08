@@ -1,133 +1,230 @@
-import * as PIXI from "pixi.js";
-import { Sprite, Texture } from "pixi.js";
+import {Loader, Sprite, Texture, TilingSprite} from "pixi.js";
+import {Component} from "./GameObject";
 
-const loader: PIXI.Loader = PIXI.Loader.shared;
-const resources = PIXI.Loader.shared.resources;
-
-abstract class UIElement extends Sprite {
-  SetVisible(state: boolean): void {
-    this.visible = state;
-  }
+abstract class UIElement extends Component {
 }
 
 export class InteractableSkinData {
-  normal: string;
-  pressed: string;
-  hover: string;
+    normal: string;
+    pressed: string;
+    hover: string;
 }
 
 class InteractableSkinTextures {
-  normal: Texture;
-  pressed: Texture;
-  hover: Texture;
+    normal: Texture;
+    pressed: Texture;
+    hover: Texture;
 }
 
 class InteractableCallbacksData {
-  onButtonDown: Function;
-  onButtonUp: Function;
-  onButtonOver: Function;
-  onButtonOut: Function;
+    onButtonDown: Function;
+    onButtonUp: Function;
+    onButtonOver: Function;
+    onButtonOut: Function;
+    onClick: Function;
 
-  CallButtonDown(): void {
-    if (this.onButtonDown == null) {
-      return;
+    CallButtonDown(): void {
+        if (this.onButtonDown == null) {
+            return;
+        }
+        this.onButtonDown();
     }
-    this.onButtonDown();
-  }
 
-  CallButtonUp(): void {
-    if (this.onButtonUp == null) {
-      return;
+    CallButtonUp(): void {
+        if (this.onButtonUp == null) {
+            return;
+        }
+        this.onButtonUp();
     }
-    this.onButtonUp();
-  }
 
-  CallButtonOver(): void {
-    if (this.onButtonOver == null) {
-      return;
+    CallButtonOver(): void {
+        if (this.onButtonOver == null) {
+            return;
+        }
+        this.onButtonOver();
     }
-    this.onButtonOver();
-  }
 
-  CallButtonOut(): void {
-    if (this.onButtonOut == null) {
-      return;
+    CallButtonOut(): void {
+        if (this.onButtonOut == null) {
+            return;
+        }
+        this.onButtonOut();
     }
-    this.onButtonOut();
-  }
+
+    CallButtonClick(): void {
+        if (this.onClick == null) {
+            return;
+        }
+        this.onClick();
+    }
 }
 
 abstract class InteractableUIElement extends UIElement {
-  skin: InteractableSkinData;
-  callbacks: InteractableCallbacksData;
-  skinTextures: InteractableSkinTextures;
+    skin: InteractableSkinData = new InteractableSkinData();
+    callbacks: InteractableCallbacksData = new InteractableCallbacksData();
+    skinTextures: InteractableSkinTextures = new InteractableSkinTextures();
 
-  constructor() {
-    super();
+    public set onClick(onClick: Function) {
+        this.callbacks.onClick = onClick;
+    }
 
-    this.buttonMode = true;
+    public get onClick() {
+        return this.callbacks.onClick;
+    }
 
-    button
-      // Mouse & touch events are normalized into
-      // the pointer* events for handling different
-      // button events.
-      .on("pointerdown", this.onButtonDown)
-      .on("pointerup", this.onButtonUp)
-      .on("pointerupoutside", this.onButtonUp)
-      .on("pointerover", this.onButtonOver)
-      .on("pointerout", this.onButtonOut);
-  }
+    protected constructor(skin?: InteractableSkinData) {
+        super();
 
-  Load(): void {
-    loader
-      .add("normal", this.skin.normal)
-      .add("hover", this.skin.hover)
-      .add("pressed", this.skin.pressed)
-      .load(this.onSkinLoaded);
-  }
+        if (skin != null) {
+            this.SetSkin(skin);
+        }
+    }
 
-  SetInteractable(state: boolean): void {
-    this.interactive = state;
-  }
+    OnStart() {
+        super.OnStart();
 
-  onSkinLoaded(): void {
-    this.skinTextures.normal = resources[this.skin.normal].texture;
-    this.skinTextures.hover = resources[this.skin.hover].texture;
-    this.skinTextures.pressed = resources[this.skin.pressed].texture;
-  }
+        this.gameObject.buttonMode = true;
+        this.SetInteractable(true);
 
-  onButtonDown(): void {
-    this.callbacks.CallButtonDown();
-  }
+        this.gameObject
+            .on("pointerdown", this.onButtonDown.bind(this))
+            .on("pointerup", this.onButtonUp.bind(this))
+            .on("pointerupoutside", this.onButtonUp.bind(this))
+            .on("pointerover", this.onButtonOver.bind(this))
+            .on("pointerout", this.onButtonOut.bind(this))
+            .on("click", this.onButtonClick.bind(this))
+            .on("tap", this.onButtonClick.bind(this));
+    }
 
-  onButtonUp(): void {
-    this.callbacks.CallButtonUp();
-  }
+    SetSkin(skin: InteractableSkinData): void {
+        this.skin = skin;
+        this.Load();
+    }
 
-  onButtonOver(): void {
-    this.callbacks.CallButtonOver();
-  }
+    private Load(): void {
 
-  onButtonOut(): void {
-    this.callbacks.CallButtonOut();
-  }
+        if (this.skin === null) {
+            return;
+        }
+
+        const loader = new Loader();
+        loader.add(this.skin.normal);
+        loader.add(this.skin.hover);
+        loader.add(this.skin.pressed);
+        loader.load(() => {
+            this.onSkinLoaded(this, loader);
+        });
+    }
+
+
+    onSkinLoaded(element: this, loader: Loader): void {
+        if (element.skinTextures == null) {
+            element.skinTextures = new InteractableSkinTextures();
+        }
+
+        if (element.skin.normal)
+            element.skinTextures.normal = loader.resources[element.skin.normal].texture;
+        if (element.skin.hover)
+            element.skinTextures.hover = loader.resources[element.skin.hover].texture;
+        if (element.skin.pressed)
+            element.skinTextures.pressed = loader.resources[element.skin.pressed].texture;
+
+        this.setStateNormal();
+    }
+
+    setStateTexture(texture: Texture): void {
+        this.gameObject.texture = texture;
+    }
+
+    setStateNormal(): void {
+        this.setStateTexture(this.skinTextures.normal);
+    }
+
+    setStateHover(): void {
+        this.setStateTexture(this.skinTextures.hover);
+    }
+
+    setStatePressed(): void {
+        this.setStateTexture(this.skinTextures.pressed);
+    }
+
+    onButtonDown() {
+        this.callbacks.CallButtonDown();
+
+        this.setStatePressed();
+    }
+
+    onButtonUp() {
+        this.callbacks.CallButtonUp();
+
+        this.setStateHover();
+    }
+
+    onButtonOver() {
+        this.callbacks.CallButtonOver();
+
+        this.setStateHover();
+    }
+
+    onButtonOut() {
+
+        this.callbacks.CallButtonOut();
+
+        this.setStateNormal();
+    }
+
+    onButtonClick() {
+        this.callbacks.CallButtonClick();
+
+        console.log("Click " + this);
+    }
+
+    SetInteractable(state: boolean): void {
+        this.gameObject.interactive = state;
+    }
 }
 
 export class UIButton extends InteractableUIElement {
-  Copy(): UIButton {
-    return Object.create(this);
-  }
-  constructor() {
-    super();
-  }
+    Copy(): UIButton {
+        let copy = new UIButton();
+        copy.skin = this.skin;
+        return copy;
+    }
+
+    constructor(skin?: InteractableSkinData) {
+        super(skin);
+    }
 }
 
-var skin = new InteractableSkinData();
-skin.normal = "./assets/UI/play_button_active.png";
-skin.hover = "./assets/UI/play_button_hover.png";
-skin.pressed = "./assets/UI/play_button_press.png";
+export class UISprite extends Component {
 
-var button = new UIButton();
-button.skin;
+    _sprite: Sprite;
 
-UIButton.prototype = button;
+    constructor(public texture?: string) {
+        super();
+    }
+
+    OnStart() {
+        super.OnStart();
+        this.Load();
+    }
+
+    OnDestroy() {
+        super.OnDestroy();
+
+        this.gameObject.RemoveChild(this._sprite);
+    }
+
+    private Load(): void {
+        const loader = new Loader();
+        loader.add(this.texture);
+        loader.load(() => {
+            this.onLoaded(this, loader);
+        });
+    }
+
+    onLoaded(element: this, loader: Loader): void {
+        this._sprite = new Sprite(loader.resources[this.texture].texture);
+        this.gameObject.AddChild(this._sprite);
+    }
+}
