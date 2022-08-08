@@ -1,4 +1,4 @@
-import {Application, Container, DisplayObject, Sprite} from "pixi.js";
+import {Application, Container, DisplayObject, ObservablePoint, Sprite} from "pixi.js";
 
 export interface IUpdatable {
     OnUpdate(): void;
@@ -22,6 +22,7 @@ export class GameObject extends Sprite implements ILifetime {
     constructor(name: string) {
         super();
         this.name = name;
+        this.anchor.set(0.5, 0.5);
     }
 
     OnStart(): void {
@@ -32,7 +33,6 @@ export class GameObject extends Sprite implements ILifetime {
 
     AddChild(child: DisplayObject): void {
         this.addChild(child)
-
         child.zIndex = this.zIndex + 1;
     }
 
@@ -40,9 +40,20 @@ export class GameObject extends Sprite implements ILifetime {
         this.removeChild(child)
     }
 
+    GetComponent<T extends Component>(type: string): T {
+        for (let i = this.targets.length - 1; i >= 0; i--) {
+            let component = this.targets[i];
+            let componentType = component.GetType();
+            if (componentType == type) {
+                return component as T;
+            }
+        }
+    }
+
     AddComponent(target: Component): void {
         this.targets.push(target);
         target.gameObject = this;
+        target.OnBind(target);
         target.OnStart.bind(target);
         target.OnStart();
         target.OnUpdate.bind(target);
@@ -70,29 +81,48 @@ export class GameObject extends Sprite implements ILifetime {
     toString(): string {
         return this.name;
     }
+
+    logSize(): void {
+        console.log(this.name + " width: " + this.getBounds());
+    }
 }
 
 export class Scene extends GameObject {
     system: GameObjectSystem = new GameObjectSystem();
     stage: Container;
+    rectTransform: RectTransform;
 
     constructor(name: string = "", private application: Application) {
         super(name);
         this.stage = application.stage;
+
+        this.pivot.set(this.width / 2, this.height / 2);
+        this.position.set(this.width / 2, this.height / 2);
+
         application.ticker.add(this.Update);
         this.system.OnUpdate.bind(this.system);
-        this.sortableChildren = true;
+        application.stage.addChild(this);
+
+        console.log("scene width: " + application.view.width + ", height: " + application.view.height);
+
+        let width = this.application.view.width;
+        let height = this.application.view.height;
+        this.rectTransform = new RectTransform(width, height);
+        this.AddComponent(this.rectTransform );
+
+        window.addEventListener("resize", function () {
+            this.this.rectTransform  .width = this.application.view.width;
+            this.rectTransform .height = this.application.view.height;
+            this.rectTransform .RecalculateSize();
+        }.bind(this));
     }
 
     CreateGameObject(name?: string): GameObject {
         let go = new GameObject(name);
-
         go.sortableChildren = true;
 
-        go.pivot.set(0.5, 0.5);
-        go.position.set(0, 0);
+        this.addChild(go);
 
-        this.AddChild(go);
         this.system.Add(go);
 
         go.OnStart.bind(go);
@@ -122,12 +152,24 @@ export class Scene extends GameObject {
             this.DestroyGameObject(go);
         }
 
+        this.application.stage.removeChild(this);
+
         this.application.ticker.remove(this.Update);
     }
 }
 
 export abstract class Component implements ILifetime {
+
+    type: string;
     gameObject: GameObject;
+
+    GetType(): string {
+        throw new Error("Undefined");
+    }
+
+    OnBind<T extends Component>(component: T): void {
+
+    }
 
     OnStart(): void {
         console.log("Component: start")
@@ -146,14 +188,66 @@ export abstract class Component implements ILifetime {
     }
 }
 
-class RectTransform extends Component {
-    children: GameObject[];
-    parent: GameObject;
+export class RectTransform extends Component {
+    public width: number = 100;
+    public height: number = 100;
+    public anchor: ObservablePoint = new ObservablePoint(this.OnRecalculate, this, 0.5, 0.5);
+    public anchoredPosition: ObservablePoint = new ObservablePoint(this.OnRecalculate, this, 0, 0);
+
+    constructor(width?: number, height?: number, public parent?: RectTransform) {
+        super();
+        this.width = width;
+        this.height = height;
+    }
+
+    public OnBind<T extends Component>(component: T) {
+        super.OnBind(component);
+
+        this.OnRecalculate.bind(this);
+        this.OnPivotChanged.bind(this);
+        this.OnPivotChanged.bind(this);
+    }
+
+    private OnRecalculate(): void {
+        this.RecalculateSize();
+    }
+
+    private OnPivotChanged(): void {
+        this.RecalculateSize();
+    }
+
+    public RecalculateSize(): void {
+
+        if (this.gameObject == null) {
+            return;
+        }
+
+        if (this.parent != null) {
+            let x = -this.parent.width / 2 + this.parent.width * this.anchor.x + this.anchoredPosition.x;
+            let y = -this.parent.height / 2 + this.parent.height * this.anchor.y + this.anchoredPosition.y;
+            this.gameObject.position.set(x, y);
+        }
+
+        this.gameObject.children.forEach(displayObject => {
+            let go = displayObject as GameObject;
+            if (go != null) {
+                let childRectTransform = go.GetComponent<RectTransform>(RectTransform.name);
+                childRectTransform.RecalculateSize();
+            }
+        })
+    }
+
+    OnStart() {
+        super.OnStart();
+        this.RecalculateSize();
+    }
 
     OnUpdate() {
         super.OnUpdate();
+    }
 
-        this.gameObject._bounds;
+    GetType(): string {
+        return RectTransform.name;
     }
 }
 

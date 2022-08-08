@@ -1,5 +1,5 @@
-import {Loader, Sprite, Texture, TilingSprite} from "pixi.js";
-import {Component} from "./GameObject";
+import {Loader, Sprite, Texture} from "pixi.js";
+import {Component, GameObject} from "./GameObject";
 
 abstract class UIElement extends Component {
 }
@@ -175,8 +175,6 @@ abstract class InteractableUIElement extends UIElement {
 
     onButtonClick() {
         this.callbacks.CallButtonClick();
-
-        console.log("Click " + this);
     }
 
     SetInteractable(state: boolean): void {
@@ -194,6 +192,10 @@ export class UIButton extends InteractableUIElement {
     constructor(skin?: InteractableSkinData) {
         super(skin);
     }
+
+    GetType(): string {
+        return UIButton.name;
+    }
 }
 
 export class UISprite extends Component {
@@ -202,6 +204,10 @@ export class UISprite extends Component {
 
     constructor(public texture?: string) {
         super();
+    }
+
+    GetType(): string {
+        return UISprite.name;
     }
 
     OnStart() {
@@ -224,7 +230,11 @@ export class UISprite extends Component {
     }
 
     onLoaded(element: this, loader: Loader): void {
-        this._sprite = new Sprite(loader.resources[this.texture].texture);
-        this.gameObject.AddChild(this._sprite);
+        let texture = loader.resources[this.texture].texture;
+        this._sprite = new Sprite(texture);
+        this._sprite.anchor.set(0.5, 0.5);
+        this._sprite.position.set(0, 0)
+        this._sprite.texture = texture;
+        this.gameObject.addChild(this._sprite);
     }
 }
