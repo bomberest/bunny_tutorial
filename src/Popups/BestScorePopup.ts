@@ -50,6 +50,9 @@ export function CreateBestScorePopup(scene: Scene): GameObject {
                 let go = scene.CreateGameObject("mi_button");
                 popup.addChild(go);
                 let button = new UIButton(Skins.MiButtonSkin);
+                button.onClick= ()=>{
+                    window.open("https://mi.com/", '_blank').focus();
+                }
                 go.AddComponent(button);
 
                 go.y = -60;

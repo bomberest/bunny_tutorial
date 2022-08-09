@@ -1,4 +1,4 @@
 export class InteractableSkinData {
-    constructor(public normal?: string, public pressed?: string, public hover?: string) {
+    constructor(public normal?: string, public hover?: string, public pressed?: string) {
     }
 }

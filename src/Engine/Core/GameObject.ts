@@ -94,9 +94,5 @@ export class GameObject extends Sprite implements ILifetime {
     toString(): string {
         return this.name;
     }
-
-    logSize(): void {
-        console.log(this.name + " width: " + this.getBounds());
-    }
 }
 
