@@ -1,4 +1,4 @@
-import {Application, Container, DisplayObject, ObservablePoint, Sprite} from "pixi.js";
+import {Application, Container, DisplayObject, Graphics, ObservablePoint, Sprite, Text} from "pixi.js";
 
 export interface IUpdatable {
     OnUpdate(): void;
@@ -16,8 +16,9 @@ interface ILifetime extends IStartable, IDestroyable, IUpdatable {
 }
 
 export class GameObject extends Sprite implements ILifetime {
-    name: string;
-    targets: Component[] = [];
+    name: string = "GameObject";
+    scene: Scene;
+    components: Component[] = [];
 
     constructor(name: string) {
         super();
@@ -41,8 +42,8 @@ export class GameObject extends Sprite implements ILifetime {
     }
 
     GetComponent<T extends Component>(type: string): T {
-        for (let i = this.targets.length - 1; i >= 0; i--) {
-            let component = this.targets[i];
+        for (let i = this.components.length - 1; i >= 0; i--) {
+            let component = this.components[i];
             let componentType = component.GetType();
             if (componentType == type) {
                 return component as T;
@@ -51,7 +52,7 @@ export class GameObject extends Sprite implements ILifetime {
     }
 
     AddComponent(target: Component): void {
-        this.targets.push(target);
+        this.components.push(target);
         target.gameObject = this;
         target.OnBind(target);
         target.OnStart.bind(target);
@@ -62,14 +63,14 @@ export class GameObject extends Sprite implements ILifetime {
     RemoveComponent(target: Component): void {
         target.OnDestroy.bind(target);
         target.OnDestroy();
-        const index = this.targets.indexOf(target, 0); //??
+        const index = this.components.indexOf(target, 0); //??
         if (index > -1) {
-            this.targets.splice(index, 1);
+            this.components.splice(index, 1);
         }
     }
 
     OnUpdate(): void {
-        this.targets.forEach((target: Component) => {
+        this.components.forEach((target: Component) => {
             if (target == null) {
                 return;
             }
@@ -92,33 +93,43 @@ export class Scene extends GameObject {
     stage: Container;
     rectTransform: RectTransform;
 
-    constructor(name: string = "", private application: Application) {
+    constructor(name: string, private application: Application, private heightOrWidth: number = 1, private heightReference: number = 1024) {
         super(name);
         this.stage = application.stage;
 
         this.pivot.set(this.width / 2, this.height / 2);
         this.position.set(this.width / 2, this.height / 2);
 
-        application.ticker.add(this.Update);
+        application.ticker.add(this.Update.bind(this));
         this.system.OnUpdate.bind(this.system);
         application.stage.addChild(this);
 
         console.log("scene width: " + application.view.width + ", height: " + application.view.height);
 
-        let width = this.application.view.width;
-        let height = this.application.view.height;
-        this.rectTransform = new RectTransform(width, height);
-        this.AddComponent(this.rectTransform );
+        this.rectTransform = new RectTransform();
+        this.AddComponent(this.rectTransform);
+        this.UpdateRectSize(this.rectTransform);
 
-        window.addEventListener("resize", function () {
-            this.this.rectTransform  .width = this.application.view.width;
-            this.rectTransform .height = this.application.view.height;
-            this.rectTransform .RecalculateSize();
-        }.bind(this));
+        window.addEventListener("resize", ev => {
+            this.UpdateRectSize(this.rectTransform);
+        });
     }
 
-    CreateGameObject(name?: string): GameObject {
+    UpdateRectSize(rectTransform: RectTransform): void {
+        let factor = this.application.view.height / this.heightReference;
+        this.scale.set(factor, factor);
+
+        let widthPercent = this.heightOrWidth;
+        let heightPercent = this.heightOrWidth;
+        rectTransform.width = this.application.view.width / factor;
+        rectTransform.height = this.application.view.height / factor;
+
+        rectTransform.RecalculateSize();
+    }
+
+    CreateGameObject(name: string = "GameObject"): GameObject {
         let go = new GameObject(name);
+        go.scene = this;
         go.sortableChildren = true;
 
         this.addChild(go);
@@ -139,7 +150,7 @@ export class Scene extends GameObject {
     }
 
     Update(): void {
-        if (this.system != null && this.system.OnUpdate != null) {
+        if (this.system != null) {
             this.system.OnUpdate();
         }
     }
@@ -164,7 +175,7 @@ export abstract class Component implements ILifetime {
     gameObject: GameObject;
 
     GetType(): string {
-        throw new Error("Undefined");
+        throw new Error("Undefined type");
     }
 
     OnBind<T extends Component>(component: T): void {
@@ -172,15 +183,12 @@ export abstract class Component implements ILifetime {
     }
 
     OnStart(): void {
-        console.log("Component: start")
     }
 
     OnDestroy(): void {
-        console.log("Component: destroy")
     }
 
     OnUpdate(): void {
-        console.log("Component: update")
     }
 
     toString(): string {
@@ -203,9 +211,9 @@ export class RectTransform extends Component {
     public OnBind<T extends Component>(component: T) {
         super.OnBind(component);
 
-        this.OnRecalculate.bind(this);
-        this.OnPivotChanged.bind(this);
-        this.OnPivotChanged.bind(this);
+        this.OnRecalculate.bind(component);
+        this.OnPivotChanged.bind(component);
+        this.OnPivotChanged.bind(component);
     }
 
     private OnRecalculate(): void {
@@ -223,18 +231,67 @@ export class RectTransform extends Component {
         }
 
         if (this.parent != null) {
+
+            let scene = this.gameObject.scene;
+            let scaleX = scene.scale.x;
+            let scaleY = scene.scale.y;
+
+            //console.log(scene.scale);
+
             let x = -this.parent.width / 2 + this.parent.width * this.anchor.x + this.anchoredPosition.x;
             let y = -this.parent.height / 2 + this.parent.height * this.anchor.y + this.anchoredPosition.y;
+
             this.gameObject.position.set(x, y);
         }
 
         this.gameObject.children.forEach(displayObject => {
-            let go = displayObject as GameObject;
-            if (go != null) {
-                let childRectTransform = go.GetComponent<RectTransform>(RectTransform.name);
-                childRectTransform.RecalculateSize();
+            if (!(displayObject instanceof GameObject)) {
+                return;
             }
+
+            let go = displayObject as GameObject;
+            if (go == null) {
+                return;
+            }
+
+            let childRectTransform = go.GetComponent<RectTransform>(RectTransform.name);
+            if (childRectTransform == null) {
+                return;
+            }
+            childRectTransform.RecalculateSize.bind(childRectTransform)();
         })
+
+        this.drawDebugView(this.gameObject);
+    }
+
+    debugView: Graphics;
+    debugText: Text;
+
+    drawDebugView(go: GameObject): void {
+
+        //return;
+
+        if (this.debugView == null) {
+            this.debugView = new Graphics();
+            this.debugText = new Text();
+            go.addChild(this.debugView)
+            this.debugView.position.set(0, 0)
+            this.debugView.zIndex = Number.MAX_VALUE;
+            this.debugText.text = go.name;
+            this.debugText.anchor.set(0.5, 0.5);
+            go.addChild(this.debugText);
+        }
+
+        const width = 4;
+        this.debugView.clear();
+        this.debugView.lineStyle(width, 0xFF0000);
+        this.debugView.drawRect(
+            -this.width / 2,
+            -this.height / 2,
+            this.width, this.height);
+        this.debugView.lineStyle(width, 0xFF0000);
+        this.debugView.drawCircle(0, 0, 1);
+        this.debugText.text = go.name;
     }
 
     OnStart() {

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import {InteractableSkinData, UIButton, UISprite} from "./Engine/UI";
 import {GameObject, RectTransform, Scene} from "./Engine/GameObject";
+import {TextStyle} from "pixi.js";
 
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {
@@ -69,34 +70,68 @@ function toggleFullscreen() {
 }
 
 
-const scene = new Scene("scene", app);
+const scene = new Scene("scene", app, 1, 1024);
+
+{
+    let popup = scene.CreateGameObject()
+
+    {
+        let background = scene.CreateGameObject("background");
+        popup.addChild(background);
+        let sprite = new UISprite('./assets/UI/info_plate_big.png');
+        background.AddComponent(sprite);
+    }
+    {
+        let blueStyle = {fontFamily: 'ZubiloBlackW01-Regular', fontSize: 56, fill: "#003E71", align: 'center'} as TextStyle;
+
+        let greenStyle = {
+            fontFamily: 'ZubiloBlackW01-Regular', fontSize: 64, fill: "#03FD16", align: 'center',
+            dropShadow: true,
+            dropShadowDistance: 5,
+            dropShadowAlpha: 0.5,
+            dropShadowAngle: 90
+        } as TextStyle;
+
+        let header = scene.CreateGameObject("background");
+        popup.addChild(header)
+        let sprite = new UISprite('./assets/UI/header_info_plate.png');
+        header.AddComponent(sprite);
+        header.position.y -= 410;
+        //header.zIndex = 2;
+
+        {
+            let text = new PIXI.Text('Your records:', blueStyle);
+            header.addChild(text);
+            text.zIndex = 1;
+            text.anchor.set(0.5, 0.5);
+            text.position.set(0, -10);
+        }
 
 
-// let go = scene.CreateGameObject();
-// let button = new UIButton(skin);
-// go.AddComponent(button);
-// go.position.set(0, 100)
-//
-// button.onClick = toggleFullscreen;
-//
-// let go2 = scene.CreateGameObject();
-// let button2 = new UIButton(skin);
-// go2.AddComponent(button2);
-// go2.position.set(0, 200)
-//
-// button2.onClick = () => {
-//     scene.Destroy();
-// };
+        {
+            let text = new PIXI.Text('Best score:', greenStyle);
+            popup.addChild(text);
+            text.zIndex = 1;
+            text.anchor.set(0.5, 0.5);
+            text.position.set(0, -300);
+        }
+    }
+}
 
-let go3 = scene.CreateGameObject();
-let button3 = new UIButton(skin);
-button3.onClick = toggleFullscreen;
-go3.AddComponent(button3);
-let rectTransform = new RectTransform(100, 100, scene.rectTransform);
-rectTransform.anchor.set(1, 0);
-rectTransform.anchoredPosition.x = -200;
-rectTransform.anchoredPosition.y = 200;
-go3.AddComponent(rectTransform)
+{
+    let go = scene.CreateGameObject("button");
+    let button = new UIButton(skin);
+    button.onClick = toggleFullscreen;
+
+    go.AddComponent(button);
+
+    let rectTransform = new RectTransform(300, 200, scene.rectTransform);
+    rectTransform.anchor.set(1, 0);
+    rectTransform.anchoredPosition.x = - 200;
+    rectTransform.anchoredPosition.y = 200;
+    go.AddComponent(rectTransform);
+}
+
 //go3.zIndex = 9000;
 
 // let popup = scene.CreateGameObject("hud");
