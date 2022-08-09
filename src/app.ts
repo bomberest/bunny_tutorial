@@ -67,7 +67,7 @@ function toggleFullscreen() {
 
 const scene = new Scene("scene", app, 1, 960);
 
-AddPlayButton();
+//AddPlayButton();
 AddSoundOnButton();
 //AddSoundOffButton();
 AddPauseButton();
@@ -83,43 +83,78 @@ AddFullScreenButton();
         background.AddComponent(sprite);
     }
     {
-        let blueStyle = {
-            fontFamily: 'ZubiloBlackW01-Regular',
-            fontSize: 56,
-            fill: "#003E71",
-            align: 'center'
-        } as TextStyle;
-
-        let greenStyle = {
-            fontFamily: 'ZubiloBlackW01-Regular', fontSize: 64, fill: "#03FD16", align: 'center',
-            dropShadow: true,
-            dropShadowDistance: 5,
-            dropShadowAlpha: 0.5,
-            dropShadowAngle: 90
-        } as TextStyle;
-
         let header = scene.CreateGameObject("background");
         popup.addChild(header)
         let sprite = new UISprite('./assets/UI/header_info_plate.png');
         header.AddComponent(sprite);
-        header.position.y -= 410;
+        header.position.y -= 407;
         //header.zIndex = 2;
 
         {
-            let text = new PIXI.Text('Your records:', blueStyle);
+            let text = new PIXI.Text('Your records:', Skins.blueStyle(56));
             header.addChild(text);
             text.zIndex = 1;
             text.anchor.set(0.5, 0.5);
             text.position.set(0, -10);
         }
 
-
         {
-            let text = new PIXI.Text('Best score:', greenStyle);
+            let text = new PIXI.Text('Best score:', Skins.greenStyle(64));
             popup.addChild(text);
             text.zIndex = 1;
             text.anchor.set(0.5, 0.5);
-            text.position.set(0, -300);
+            text.position.set(0, -315);
+        }
+
+        {
+            let text = new PIXI.Text("402", Skins.greenStyle(64));
+            popup.addChild(text);
+            text.zIndex = 1;
+            text.anchor.set(0.5, 0.5);
+            text.position.set(0, -240);
+        }
+
+        {
+            let go = scene.CreateGameObject("mi_button");
+            popup.addChild(go);
+            let button = new UIButton(Skins.MiButtonSkin);
+            go.AddComponent(button);
+
+            go.y = -60;
+        }
+
+        {
+            {
+                let go = scene.CreateGameObject("user_name_bar");
+                popup.addChild(go);
+                let barSprite = new UISprite(Skins.UserNameBarSkin);
+                go.AddComponent(barSprite);
+                go.position.set(0, 105);
+            }
+
+            {
+                let text = new PIXI.Text("Guest_11826", Skins.whiteStyle(50));
+                popup.addChild(text);
+                text.zIndex = 1;
+                text.anchor.set(1, 0.5);
+                text.position.set(20, 105);
+            }
+        }
+
+        {
+            let go = scene.CreateGameObject("leaderboard_button");
+            popup.addChild(go);
+            let button = new UIButton(Skins.LeaderboardButtonSkin);
+            go.AddComponent(button);
+            go.position.set(-160, 300);
+        }
+
+        {
+            let go = scene.CreateGameObject("play_button");
+            popup.addChild(go);
+            let button = new UIButton(Skins.PlayButtonSkin);
+            go.AddComponent(button);
+            go.position.set(160, 300);
         }
     }
 }
