@@ -2,6 +2,8 @@ import * as PIXI from 'pixi.js';
 import {CreateBestScorePopup} from "./Popups/BestScorePopup";
 import {CreateHUD} from "./Popups/HUD";
 import {Scene} from "./Engine/Core/Scene";
+import {CreateScorePopup} from "./Popups/ScorePopup";
+import {CreateLeaderboardPopup} from "./Popups/LeaderboardPopup";
 
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {
@@ -28,5 +30,6 @@ window.addEventListener("resize", function () {
 
 const scene = new Scene("scene", app, 1, 960);
 
+let bestScorePopup = CreateLeaderboardPopup(scene);
+// let bestScorePopup = CreateScorePopup(scene);
 CreateHUD(scene);
-let bestScorePopup = CreateBestScorePopup(scene);

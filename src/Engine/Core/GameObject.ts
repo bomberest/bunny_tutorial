@@ -81,6 +81,10 @@ export class GameObject extends Sprite implements ILifetime {
         this.scene.DestroyGameObject(go);
     }
 
+    Destroy(): void{
+        this.DestroyGameObject(this);
+    }
+
     OnUpdate(): void {
         this.components.forEach((target: Component) => {
             if (target == null) {

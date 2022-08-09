@@ -8,7 +8,7 @@ export class Scene extends GameObject {
     stage: Container;
     rectTransform: RectTransform;
 
-    constructor(name: string, private application: Application, private heightOrWidth: number = 1, private heightReference: number = 1024) {
+    constructor(name: string, public application: Application, private heightOrWidth: number = 1, private heightReference: number = 1024) {
         super(name);
         this.stage = application.stage;
 

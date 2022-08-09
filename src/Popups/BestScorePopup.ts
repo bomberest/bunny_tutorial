@@ -7,7 +7,7 @@ import {Scene} from "../Engine/Core/Scene";
 
 export function CreateBestScorePopup(scene: Scene): GameObject {
     {
-        let popup = scene.CreateGameObject()
+        let popup = scene.CreateGameObject("best_score_popup")
 
         {
             let background = scene.CreateGameObject("background");
