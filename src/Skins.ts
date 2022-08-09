@@ -1,7 +1,9 @@
-import {InteractableSkinData} from "./Engine/UI";
-import {TextStyle, TextStyleFontStyle} from "pixi.js";
+import {TextStyle} from "pixi.js";
+import {InteractableSkinData} from "./Engine/UI/InteractableSkinData";
 
 export const UserNameBarSkin = "./assets/UI/user_name_bar.png";
+export const CoinScorePlateSkin = "./assets/UI/coin_score_plate.png";
+export const CollectCoinIconSkin = "./assets/UI/collect_coin_icon.png";
 
 export const PlayButtonSkin = new InteractableSkinData(
     "./assets/UI/play_button_active.png",

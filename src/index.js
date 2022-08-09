@@ -1,1 +1,1 @@
-var core = require('./app.ts')
+const _ = require('./app.ts');

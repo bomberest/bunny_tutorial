@@ -1,64 +1,10 @@
-import {Loader, Sprite, Texture} from "pixi.js";
-import {Component, GameObject} from "./GameObject";
+import {Loader, Texture} from "pixi.js";
+import {InteractableSkinData} from "./InteractableSkinData";
+import {InteractableSkinTextures} from "./InteractableSkinTextures";
+import {InteractableCallbacksData} from "./InteractableCallbacksData";
+import {UIElement} from "./UIElement";
 
-abstract class UIElement extends Component {
-}
-
-export class InteractableSkinData {
-    constructor(public normal?: string, public pressed?: string, public hover?: string) {
-    }
-}
-
-class InteractableSkinTextures {
-    normal: Texture;
-    pressed: Texture;
-    hover: Texture;
-}
-
-class InteractableCallbacksData {
-    onButtonDown: Function;
-    onButtonUp: Function;
-    onButtonOver: Function;
-    onButtonOut: Function;
-    onClick: Function;
-
-    CallButtonDown(): void {
-        if (this.onButtonDown == null) {
-            return;
-        }
-        this.onButtonDown();
-    }
-
-    CallButtonUp(): void {
-        if (this.onButtonUp == null) {
-            return;
-        }
-        this.onButtonUp();
-    }
-
-    CallButtonOver(): void {
-        if (this.onButtonOver == null) {
-            return;
-        }
-        this.onButtonOver();
-    }
-
-    CallButtonOut(): void {
-        if (this.onButtonOut == null) {
-            return;
-        }
-        this.onButtonOut();
-    }
-
-    CallButtonClick(): void {
-        if (this.onClick == null) {
-            return;
-        }
-        this.onClick();
-    }
-}
-
-abstract class InteractableUIElement extends UIElement {
+export abstract class InteractableUIElement extends UIElement {
     skin: InteractableSkinData = new InteractableSkinData();
     callbacks: InteractableCallbacksData = new InteractableCallbacksData();
     skinTextures: InteractableSkinTextures = new InteractableSkinTextures();
@@ -178,62 +124,5 @@ abstract class InteractableUIElement extends UIElement {
 
     SetInteractable(state: boolean): void {
         this.gameObject.interactive = state;
-    }
-}
-
-export class UIButton extends InteractableUIElement {
-    Copy(): UIButton {
-        let copy = new UIButton();
-        copy.skin = this.skin;
-        return copy;
-    }
-
-    constructor(skin?: InteractableSkinData) {
-        super(skin);
-    }
-
-    GetType(): string {
-        return UIButton.name;
-    }
-}
-
-export class UISprite extends Component {
-
-    _sprite: Sprite;
-
-    constructor(public texture?: string) {
-        super();
-    }
-
-    GetType(): string {
-        return UISprite.name;
-    }
-
-    OnStart() {
-        super.OnStart();
-        this.Load();
-    }
-
-    OnDestroy() {
-        super.OnDestroy();
-
-        this.gameObject.RemoveChild(this._sprite);
-    }
-
-    private Load(): void {
-        const loader = new Loader();
-        loader.add(this.texture);
-        loader.load(() => {
-            this.onLoaded(this, loader);
-        });
-    }
-
-    onLoaded(element: this, loader: Loader): void {
-        let texture = loader.resources[this.texture].texture;
-        this._sprite = new Sprite(texture);
-        this._sprite.anchor.set(0.5, 0.5);
-        this._sprite.position.set(0, 0)
-        this._sprite.texture = texture;
-        this.gameObject.addChild(this._sprite);
     }
 }

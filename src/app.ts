@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
-import {Scene} from "./Engine/GameObject";
 import {CreateBestScorePopup} from "./Popups/BestScorePopup";
 import {CreateHUD} from "./Popups/HUD";
+import {Scene} from "./Engine/Core/Scene";
 
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {

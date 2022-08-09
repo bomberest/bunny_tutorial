@@ -1,7 +1,9 @@
-import {UIButton, UISprite} from "../Engine/UI";
 import * as PIXI from "pixi.js";
 import * as Skins from "../Skins";
-import {GameObject, Scene} from "../Engine/GameObject";
+import {GameObject} from "../Engine/Core/GameObject";
+import {UIButton} from "../Engine/UI/UIButton";
+import {UISprite} from "../Engine/UI/UISprite";
+import {Scene} from "../Engine/Core/Scene";
 
 export function CreateBestScorePopup(scene: Scene): GameObject {
     {
@@ -19,7 +21,6 @@ export function CreateBestScorePopup(scene: Scene): GameObject {
             let sprite = new UISprite('./assets/UI/header_info_plate.png');
             header.AddComponent(sprite);
             header.position.y -= 407;
-            //header.zIndex = 2;
 
             {
                 let text = new PIXI.Text('Your records:', Skins.blueStyle(56));
