@@ -65,7 +65,7 @@ function toggleFullscreen() {
 }
 
 
-const scene = new Scene("scene", app, 1, 1024);
+const scene = new Scene("scene", app, 1, 960);
 
 AddPlayButton();
 AddSoundOnButton();
@@ -146,8 +146,8 @@ function AddSoundOnButton() {
 
     let rectTransform = new RectTransform(120, 120, scene.rectTransform);
     rectTransform.anchor.set(1, 0);
-    rectTransform.anchoredPosition.x = -250;
-    rectTransform.anchoredPosition.y = 100;
+    rectTransform.anchoredPosition.x = -80 - 140 * 1;
+    rectTransform.anchoredPosition.y = 70;
     go.AddComponent(rectTransform);
 }
 
@@ -159,8 +159,8 @@ function AddSoundOffButton() {
 
     let rectTransform = new RectTransform(120, 120, scene.rectTransform);
     rectTransform.anchor.set(1, 0);
-    rectTransform.anchoredPosition.x = -250;
-    rectTransform.anchoredPosition.y = 100;
+    rectTransform.anchoredPosition.x = -80 - 140 * 1;
+    rectTransform.anchoredPosition.y = 70;
     go.AddComponent(rectTransform);
 }
 
@@ -172,8 +172,8 @@ function AddPauseButton() {
 
     let rectTransform = new RectTransform(120, 120, scene.rectTransform);
     rectTransform.anchor.set(1, 0);
-    rectTransform.anchoredPosition.x = -100;
-    rectTransform.anchoredPosition.y = 100;
+    rectTransform.anchoredPosition.x = -80 - 140 * 0;
+    rectTransform.anchoredPosition.y = 70;
     go.AddComponent(rectTransform);
 }
 
@@ -186,8 +186,8 @@ function AddFullScreenButton() {
 
     let rectTransform = new RectTransform(120, 120, scene.rectTransform);
     rectTransform.anchor.set(1, 0);
-    rectTransform.anchoredPosition.x = -400;
-    rectTransform.anchoredPosition.y = 100;
+    rectTransform.anchoredPosition.x = -80 - 140 * 2;
+    rectTransform.anchoredPosition.y = 70;
     go.AddComponent(rectTransform);
 }
 
