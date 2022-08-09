@@ -14,7 +14,7 @@ export class LeaderboardDataItem {
     }
 }
 
-const leaderboardData: LeaderboardDataItem[] = [
+const allTimeData: LeaderboardDataItem[] = [
     new LeaderboardDataItem("PavelNikolaevich", 49444),
     new LeaderboardDataItem("Alex", 46822),
     new LeaderboardDataItem("Alexandr Velikiy", 27203),
@@ -26,6 +26,10 @@ const leaderboardData: LeaderboardDataItem[] = [
     new LeaderboardDataItem("34835252582352", 15533),
     new LeaderboardDataItem("Fahmi Aditya", 15179),
 ]
+
+const emptyData: LeaderboardDataItem[] = [
+    new LeaderboardDataItem("Single", 1000)
+];
 
 function GetBackgroundByPlace(place: number) {
     switch (place) {
@@ -108,8 +112,13 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
 
             let yOffset = -235 - 80;
 
-            for (let i = 0; i < leaderboardData.length; i++) {
+            let data = emptyData;
+
+            for (let i = 0; i < 10; i++) {
                 {
+                    let name: string = data == null || data.length <= i ? "-" : data[i].name;
+                    let count: string = data == null || data.length <= i ? "-" : data[i].count.toString();
+
                     if (i < 3) {
                         yOffset += 80;
                     } else if (i == 3) {
@@ -145,7 +154,7 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
                         }
 
                         {
-                            let text = new PIXI.Text(leaderboardData[i].name, GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
+                            let text = new PIXI.Text(name, GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
                             go.addChild(text);
                             text.zIndex = 1;
                             text.anchor.set(0, 0.5);
@@ -161,7 +170,7 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
 
 
                         {
-                            let text = new PIXI.Text(leaderboardData[i].count, GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
+                            let text = new PIXI.Text(count, GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
                             go.addChild(text);
                             text.zIndex = 1;
                             text.anchor.set(0.5, 0.5);

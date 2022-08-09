@@ -14,7 +14,7 @@ PIXI.utils.sayHello(type);
 
 const Application = PIXI.Application;
 
-const app = new Application({width: 512, height: 512});
+const app = new Application({width: 512, height: 512, backgroundColor: 99999});
 document.body.appendChild(app.view);
 
 app.renderer.view.style.position = "absolute";
