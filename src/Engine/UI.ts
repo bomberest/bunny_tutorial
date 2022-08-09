@@ -5,9 +5,8 @@ abstract class UIElement extends Component {
 }
 
 export class InteractableSkinData {
-    normal: string;
-    pressed: string;
-    hover: string;
+    constructor(public normal?: string, public pressed?: string, public hover?: string) {
+    }
 }
 
 class InteractableSkinTextures {

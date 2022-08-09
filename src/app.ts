@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import * as Skins from './Skins';
 import {InteractableSkinData, UIButton, UISprite} from "./Engine/UI";
 import {GameObject, RectTransform, Scene} from "./Engine/GameObject";
 import {TextStyle} from "pixi.js";
@@ -36,12 +37,6 @@ window.addEventListener("resize", function () {
     app.stage.position.set(app.view.width / 2, app.view.height / 2);
 });
 
-const skin = new InteractableSkinData()
-
-skin.normal = "./assets/UI/play_button_active.png";
-skin.hover = "./assets/UI/play_button_hover.png";
-skin.pressed = "./assets/UI/play_button_press.png";
-
 let fullScreen = false;
 
 function toggleFullscreen() {
@@ -72,6 +67,12 @@ function toggleFullscreen() {
 
 const scene = new Scene("scene", app, 1, 1024);
 
+AddPlayButton();
+AddSoundOnButton();
+//AddSoundOffButton();
+AddPauseButton();
+AddFullScreenButton();
+
 {
     let popup = scene.CreateGameObject()
 
@@ -82,7 +83,12 @@ const scene = new Scene("scene", app, 1, 1024);
         background.AddComponent(sprite);
     }
     {
-        let blueStyle = {fontFamily: 'ZubiloBlackW01-Regular', fontSize: 56, fill: "#003E71", align: 'center'} as TextStyle;
+        let blueStyle = {
+            fontFamily: 'ZubiloBlackW01-Regular',
+            fontSize: 56,
+            fill: "#003E71",
+            align: 'center'
+        } as TextStyle;
 
         let greenStyle = {
             fontFamily: 'ZubiloBlackW01-Regular', fontSize: 64, fill: "#03FD16", align: 'center',
@@ -118,19 +124,73 @@ const scene = new Scene("scene", app, 1, 1024);
     }
 }
 
-{
-    let go = scene.CreateGameObject("button");
-    let button = new UIButton(skin);
+function AddPlayButton() {
+    let go = scene.CreateGameObject("play_button");
+    let button = new UIButton(Skins.PlayButtonSkin);
     button.onClick = toggleFullscreen;
 
     go.AddComponent(button);
 
     let rectTransform = new RectTransform(300, 200, scene.rectTransform);
     rectTransform.anchor.set(1, 0);
-    rectTransform.anchoredPosition.x = - 200;
-    rectTransform.anchoredPosition.y = 200;
+    rectTransform.anchoredPosition.x = -200;
+    rectTransform.anchoredPosition.y = 400;
     go.AddComponent(rectTransform);
 }
+
+function AddSoundOnButton() {
+    let go = scene.CreateGameObject("sound_on_button");
+    let button = new UIButton(Skins.SoundOnButtonSkin);
+
+    go.AddComponent(button);
+
+    let rectTransform = new RectTransform(120, 120, scene.rectTransform);
+    rectTransform.anchor.set(1, 0);
+    rectTransform.anchoredPosition.x = -250;
+    rectTransform.anchoredPosition.y = 100;
+    go.AddComponent(rectTransform);
+}
+
+function AddSoundOffButton() {
+    let go = scene.CreateGameObject("sound_off_button");
+    let button = new UIButton(Skins.SoundOnButtonSkin);
+
+    go.AddComponent(button);
+
+    let rectTransform = new RectTransform(120, 120, scene.rectTransform);
+    rectTransform.anchor.set(1, 0);
+    rectTransform.anchoredPosition.x = -250;
+    rectTransform.anchoredPosition.y = 100;
+    go.AddComponent(rectTransform);
+}
+
+function AddPauseButton() {
+    let go = scene.CreateGameObject("pause_button");
+    let button = new UIButton(Skins.PauseButtonSkin);
+
+    go.AddComponent(button);
+
+    let rectTransform = new RectTransform(120, 120, scene.rectTransform);
+    rectTransform.anchor.set(1, 0);
+    rectTransform.anchoredPosition.x = -100;
+    rectTransform.anchoredPosition.y = 100;
+    go.AddComponent(rectTransform);
+}
+
+function AddFullScreenButton() {
+    let go = scene.CreateGameObject("pause_button");
+    let button = new UIButton(Skins.FullscreenButtonSkin);
+    button.onClick = toggleFullscreen;
+
+    go.AddComponent(button);
+
+    let rectTransform = new RectTransform(120, 120, scene.rectTransform);
+    rectTransform.anchor.set(1, 0);
+    rectTransform.anchoredPosition.x = -400;
+    rectTransform.anchoredPosition.y = 100;
+    go.AddComponent(rectTransform);
+}
+
 
 //go3.zIndex = 9000;
 

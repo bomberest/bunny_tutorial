@@ -202,6 +202,14 @@ export class RectTransform extends Component {
     public anchor: ObservablePoint = new ObservablePoint(this.OnRecalculate, this, 0.5, 0.5);
     public anchoredPosition: ObservablePoint = new ObservablePoint(this.OnRecalculate, this, 0, 0);
 
+    get AnchorPositionX(): number {
+        return -this.parent.width / 2 + this.parent.width * this.anchor.x;
+    }
+
+    get AnchorPositionY(): number {
+        return -this.parent.height / 2 + this.parent.height * this.anchor.y;
+    }
+
     constructor(width?: number, height?: number, public parent?: RectTransform) {
         super();
         this.width = width;
@@ -232,16 +240,10 @@ export class RectTransform extends Component {
 
         if (this.parent != null) {
 
-            let scene = this.gameObject.scene;
-            let scaleX = scene.scale.x;
-            let scaleY = scene.scale.y;
-
-            //console.log(scene.scale);
-
-            let x = -this.parent.width / 2 + this.parent.width * this.anchor.x + this.anchoredPosition.x;
-            let y = -this.parent.height / 2 + this.parent.height * this.anchor.y + this.anchoredPosition.y;
-
-            this.gameObject.position.set(x, y);
+            this.gameObject.position.set(
+                this.AnchorPositionX + this.anchoredPosition.x,
+                this.AnchorPositionY + this.anchoredPosition.y
+            );
         }
 
         this.gameObject.children.forEach(displayObject => {
@@ -267,31 +269,55 @@ export class RectTransform extends Component {
     debugView: Graphics;
     debugText: Text;
 
+    drawDebugRect: boolean = true;
+    drawDebugText: boolean = false;
+
     drawDebugView(go: GameObject): void {
 
-        //return;
-
-        if (this.debugView == null) {
-            this.debugView = new Graphics();
-            this.debugText = new Text();
-            go.addChild(this.debugView)
-            this.debugView.position.set(0, 0)
-            this.debugView.zIndex = Number.MAX_VALUE;
-            this.debugText.text = go.name;
-            this.debugText.anchor.set(0.5, 0.5);
-            go.addChild(this.debugText);
+        if (!this.drawDebugRect && !this.drawDebugText) {
+            return;
         }
 
-        const width = 4;
+        if (this.debugView == null) {
+
+            if (this.drawDebugRect) {
+                this.debugView = new Graphics();
+                go.addChild(this.debugView)
+                this.debugView.position.set(0, 0)
+                this.debugView.zIndex = Number.MAX_VALUE;
+            }
+
+            if (this.drawDebugText) {
+                this.debugText = new Text();
+                this.debugText.text = go.name;
+                this.debugText.anchor.set(0.5, 0.5);
+                go.addChild(this.debugText);
+            }
+
+        }
+
+        if (this.debugView == null) {
+            return;
+        }
+
         this.debugView.clear();
-        this.debugView.lineStyle(width, 0xFF0000);
-        this.debugView.drawRect(
-            -this.width / 2,
-            -this.height / 2,
-            this.width, this.height);
-        this.debugView.lineStyle(width, 0xFF0000);
-        this.debugView.drawCircle(0, 0, 1);
-        this.debugText.text = go.name;
+
+        const width = 4;
+
+        if (this.drawDebugRect) {
+            this.debugView.lineStyle(width, 0xFF0000);
+            this.debugView.drawRect(
+                -this.width / 2,
+                -this.height / 2,
+                this.width, this.height);
+            this.debugView.lineStyle(width, 0xFF0000);
+            this.debugView.drawCircle(0, 0, 1);
+        }
+
+        if (this.drawDebugText) {
+            this.debugText.text = go.name;
+        }
+
     }
 
     OnStart() {
