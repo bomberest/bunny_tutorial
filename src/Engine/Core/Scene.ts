@@ -61,6 +61,7 @@ export class Scene extends GameObject {
         this.system.Remove(go);
         go.OnDestroy.bind(go);
         go.OnDestroy();
+        go.visible = false;
         go.destroy();
     }
 

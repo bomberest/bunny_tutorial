@@ -32,6 +32,8 @@ export class GameObject extends Sprite implements ILifetime {
     }
 
     OnDestroy(): void {
+        this.components.forEach(value => value.OnDestroy());
+        this.components = [];
     }
 
     AddChild(child: DisplayObject): void {

@@ -7,6 +7,7 @@ import {Scene} from "../Engine/Core/Scene";
 import {CreateBestScorePopup} from "./BestScorePopup";
 import {MiddleLeaderCountBarSkin} from "../Skins";
 import {RectTransform} from "../Engine/Core/RectTransform";
+import {Container, Text} from "pixi.js";
 
 export class LeaderboardDataItem {
 
@@ -14,22 +15,33 @@ export class LeaderboardDataItem {
     }
 }
 
-const allTimeData: LeaderboardDataItem[] = [
-    new LeaderboardDataItem("PavelNikolaevich", 49444),
-    new LeaderboardDataItem("Alex", 46822),
-    new LeaderboardDataItem("Alexandr Velikiy", 27203),
-    new LeaderboardDataItem("Aleksey", 20545),
-    new LeaderboardDataItem("Kevin Arbianto", 16801),
-    new LeaderboardDataItem("42145262262", 100),
-    new LeaderboardDataItem("willvase", 15981),
-    new LeaderboardDataItem("Djoko Pramono", 15816),
-    new LeaderboardDataItem("34835252582352", 15533),
-    new LeaderboardDataItem("Fahmi Aditya", 15179),
-]
+export class LeaderboardItem {
 
-const emptyData: LeaderboardDataItem[] = [
-    new LeaderboardDataItem("Single", 1000)
-];
+    constructor(public container: GameObject, public nameText: Text, public countText: Text) {
+    }
+}
+
+export class Leaderboard {
+    constructor(public name: string, public data: LeaderboardDataItem[]) {
+    }
+}
+
+const leaderboards: Leaderboard[] = [
+    new Leaderboard("All time", [
+        new LeaderboardDataItem("PavelNikolaevich", 49444),
+        new LeaderboardDataItem("Alex", 46822),
+        new LeaderboardDataItem("Alexandr Velikiy", 27203),
+        new LeaderboardDataItem("Aleksey", 20545),
+        new LeaderboardDataItem("Kevin Arbianto", 16801),
+        new LeaderboardDataItem("42145262262", 100),
+        new LeaderboardDataItem("willvase", 15981),
+        new LeaderboardDataItem("Djoko Pramono", 15816),
+        new LeaderboardDataItem("34835252582352", 15533),
+        new LeaderboardDataItem("Fahmi Aditya", 15179),
+    ]),
+    new Leaderboard("Week", [new LeaderboardDataItem("Single", 1000)]),
+    new Leaderboard("Month", [])
+]
 
 function GetBackgroundByPlace(place: number) {
     switch (place) {
@@ -57,8 +69,108 @@ function GetFontStyleByPlace(place: number, fontSize: number) {
     }
 }
 
+let leaderboardTitleText: Text;
+let list: LeaderboardItem[] = [];
+let timeouts: NodeJS.Timeout[] = [];
+
+function RedrawList(leaderboard?: Leaderboard) {
+    if (leaderboard == null) {
+        leaderboard = leaderboards[currentLeaderboardIndex];
+    }
+    leaderboardTitleText.text = leaderboard.name;
+    let data = leaderboard.data;
+    for (let i = 0; i < list.length; i++) {
+        let name: string = data == null || data.length <= i ? "-" : data[i].name;
+        let count: string = data == null || data.length <= i ? "-" : data[i].count.toString();
+        let item = list[i];
+        item.nameText.text = name;
+        item.countText.text = count;
+
+        clearTimeout(timeouts[i]);
+        item.container.scale.set(0, 0);
+        let timeout = setTimeout(() => {
+            item.container.scale.set(1, 1);
+        }, 200 + i * 80);
+        timeouts[i] = timeout;
+    }
+}
+
+function CreateList(root: GameObject) {
+
+    let nameText: Text;
+    let countText: Text;
+
+    let yOffset = -235 - 80;
+
+    for (let i = 0; i < 10; i++) {
+        {
+            if (i < 3) {
+                yOffset += 80;
+            } else if (i == 3) {
+                yOffset += 67;
+            } else {
+                yOffset += 47;
+            }
+
+            let item = root.CreateGameObject("item_" + i);
+            item.x = 0;
+            item.y = yOffset;
+            item.scale.set(0, 0);
+            setTimeout(() => {
+                item.scale.set(1, 1);
+            }, 500 + i * 80);
+
+            {
+                let go = item.CreateGameObject("bar");
+                let barSprite = new UISprite(GetBackgroundByPlace(i + 1));
+                go.AddComponent(barSprite);
+                go.position.set((i < 3 ? -98 : -62), 0);
+
+                if (i >= 3) {
+                    {
+                        let text = new PIXI.Text((i + 1), Skins.whiteStyle(38));
+                        go.addChild(text);
+                        text.zIndex = 1;
+                        text.anchor.set(0, 0.5);
+                        text.position.set(-260, 0);
+                    }
+                }
+
+                {
+                    nameText = new PIXI.Text("", GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
+                    go.addChild(nameText);
+                    nameText.zIndex = 1;
+                    nameText.anchor.set(0, 0.5);
+                    nameText.position.set((i < 3 ? -170 : -195), -2);
+                }
+            }
+
+            {
+                let go = item.CreateGameObject("count_bar");
+                let barSprite = new UISprite(i < 3 ? Skins.HighLeaderCountBarSkin : MiddleLeaderCountBarSkin);
+                go.AddComponent(barSprite);
+                go.position.set(255, 0);
+
+                {
+                    countText = new PIXI.Text("", GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
+                    go.addChild(countText);
+                    countText.zIndex = 1;
+                    countText.anchor.set(0.5, 0.5);
+                    countText.position.set(0, -2);
+                }
+            }
+
+            let row = new LeaderboardItem(item, nameText, countText);
+            list.push(row);
+        }
+    }
+}
+
+let currentLeaderboardIndex = 0;
+
 export function CreateLeaderboardPopup(scene: Scene): GameObject {
     {
+        currentLeaderboardIndex = 0;
         let popup = scene.CreateGameObject("leaderboard_popup")
 
         {
@@ -83,18 +195,24 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
             }
 
             {
-                let text = new PIXI.Text("All time", Skins.orangeStyle(64));
-                scene.addChild(text); //bug
-                text.anchor.set(0.5, 0.5);
-                text.position.set(0, -310);
+                leaderboardTitleText = new PIXI.Text("All time", Skins.orangeStyle(64));
+                scene.addChild(leaderboardTitleText); //bug
+                leaderboardTitleText.anchor.set(0.5, 0.5);
+                leaderboardTitleText.position.set(0, -310);
             }
 
             {
                 let go = popup.CreateGameObject("previous");
                 let button = new UIButton(Skins.NextButtonSkin);
-                button.onClick = () => {
+                button.onClick = (() => {
                     console.log("previous click")
-                }
+                    currentLeaderboardIndex--;
+                    if (currentLeaderboardIndex < 0) {
+                        currentLeaderboardIndex = leaderboards.length - 1;
+                    }
+
+                    RedrawList();
+                });
                 go.AddComponent(button);
                 go.position.set(-270, -310);
                 go.scale.set(-1, 1)
@@ -105,80 +223,19 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
                 let button = new UIButton(Skins.NextButtonSkin);
                 button.onClick = () => {
                     console.log("next click")
+                    currentLeaderboardIndex++;
+                    if (currentLeaderboardIndex == leaderboards.length) {
+                        currentLeaderboardIndex = 0;
+                    }
+
+                    RedrawList();
                 }
                 go.AddComponent(button);
                 go.position.set(270, -310);
             }
 
-            let yOffset = -235 - 80;
-
-            let data = emptyData;
-
-            for (let i = 0; i < 10; i++) {
-                {
-                    let name: string = data == null || data.length <= i ? "-" : data[i].name;
-                    let count: string = data == null || data.length <= i ? "-" : data[i].count.toString();
-
-                    if (i < 3) {
-                        yOffset += 80;
-                    } else if (i == 3) {
-                        yOffset += 67;
-                    } else {
-                        yOffset += 47;
-
-                    }
-
-                    let item = popup.CreateGameObject("item_" + i);
-                    item.AddComponent(new RectTransform());
-                    item.x = 0;
-                    item.y = yOffset;
-                    item.scale.set(0, 0);
-                    setTimeout(() => {
-                        item.scale.set(1, 1);
-                    }, 500 + i * 80);
-
-                    {
-                        let go = item.CreateGameObject("bar");
-                        let barSprite = new UISprite(GetBackgroundByPlace(i + 1));
-                        go.AddComponent(barSprite);
-                        go.position.set((i < 3 ? -98 : -62), 0);
-
-                        if (i >= 3) {
-                            {
-                                let text = new PIXI.Text((i + 1), Skins.whiteStyle(38));
-                                go.addChild(text);
-                                text.zIndex = 1;
-                                text.anchor.set(0, 0.5);
-                                text.position.set(-260, 0);
-                            }
-                        }
-
-                        {
-                            let text = new PIXI.Text(name, GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
-                            go.addChild(text);
-                            text.zIndex = 1;
-                            text.anchor.set(0, 0.5);
-                            text.position.set((i < 3 ? -170 : -195), -2);
-                        }
-                    }
-
-                    {
-                        let go = item.CreateGameObject("count_bar");
-                        let barSprite = new UISprite(i < 3 ? Skins.HighLeaderCountBarSkin : MiddleLeaderCountBarSkin);
-                        go.AddComponent(barSprite);
-                        go.position.set(255, 0);
-
-
-                        {
-                            let text = new PIXI.Text(count, GetFontStyleByPlace(i + 1, (i < 3 ? 42 : 37)));
-                            go.addChild(text);
-                            text.zIndex = 1;
-                            text.anchor.set(0.5, 0.5);
-                            text.position.set(0, -2);
-                        }
-                    }
-                }
-            }
+            CreateList(popup);
+            RedrawList();
 
             {
                 let go = popup.CreateGameObject("ok_button");
