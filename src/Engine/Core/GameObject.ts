@@ -1,4 +1,4 @@
-import {DisplayObject, Sprite} from "pixi.js";
+import {DisplayObject, Sprite, Ticker} from "pixi.js";
 import {Component} from "./Component";
 import {Scene} from "./Scene";
 
@@ -26,6 +26,22 @@ export class GameObject extends Sprite implements ILifetime {
         super();
         this.name = name;
         this.anchor.set(0.5, 0.5);
+    }
+
+    get ticker(): Ticker {
+        return this.scene.application.ticker;
+    }
+
+    get deltaTime(): number {
+        return this.scene.application.ticker.deltaTime;
+    }
+
+    get size(): number {
+        return this.scale.x;
+    }
+
+    set size(value: number) {
+        this.scale.set(value, value);
     }
 
     OnStart(): void {
@@ -83,7 +99,7 @@ export class GameObject extends Sprite implements ILifetime {
         this.scene.DestroyGameObject(go);
     }
 
-    Destroy(): void{
+    Destroy(): void {
         this.DestroyGameObject(this);
     }
 

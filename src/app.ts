@@ -27,9 +27,9 @@ window.addEventListener("resize", function () {
     app.stage.position.set(app.view.width / 2, app.view.height / 2);
 });
 
-
 const scene = new Scene("scene", app, 1, 960);
 
-let bestScorePopup = CreateLeaderboardPopup(scene);
-// let bestScorePopup = CreateScorePopup(scene);
+//let leaderboardPopup = CreateLeaderboardPopup(scene);
+// let scorePopup = CreateScorePopup(scene);
+let bestScorePopup = CreateScorePopup(scene, true);
 CreateHUD(scene);

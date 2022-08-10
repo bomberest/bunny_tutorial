@@ -1,4 +1,4 @@
-import {Application, Container} from "pixi.js";
+import {Application, Container, Ticker} from "pixi.js";
 import {RectTransform} from "./RectTransform";
 import {GameObject} from "./GameObject";
 import {GameObjectSystem} from "../Systems/GameObjectSystem";
