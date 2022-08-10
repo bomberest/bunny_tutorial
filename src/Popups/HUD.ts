@@ -37,29 +37,44 @@ export function CreateHUD(scene: Scene) {
     }
 
     function AddSoundOnButton() {
-        let go = scene.CreateGameObject("sound_on_button");
+        let soundOnButton = scene.CreateGameObject("sound_on_button");
         let button = new UIButton(Skins.SoundOnButtonSkin);
 
-        go.AddComponent(button);
+        soundOnButton.AddComponent(button);
 
         let rectTransform = new RectTransform(120, 120, scene.rectTransform);
         rectTransform.anchor.set(1, 0);
         rectTransform.anchoredPosition.x = -80 - 140 * 1;
         rectTransform.anchoredPosition.y = 70;
-        go.AddComponent(rectTransform);
+        soundOnButton.AddComponent(rectTransform);
     }
 
-    function AddSoundOffButton() {
-        let go = scene.CreateGameObject("sound_off_button");
-        let button = new UIButton(Skins.SoundOnButtonSkin);
-
-        go.AddComponent(button);
-
+    function AddSoundButton(state: boolean) {
+        let soundContainer = scene.CreateGameObject("sound_off_button");
         let rectTransform = new RectTransform(120, 120, scene.rectTransform);
         rectTransform.anchor.set(1, 0);
         rectTransform.anchoredPosition.x = -80 - 140 * 1;
         rectTransform.anchoredPosition.y = 70;
-        go.AddComponent(rectTransform);
+        soundContainer.AddComponent(rectTransform)
+
+        let soundOffGo = soundContainer.CreateGameObject("sound_off_button");
+        let buttonOff = new UIButton(Skins.SoundOffButtonSkin);
+        soundOffGo.AddComponent(buttonOff);
+        buttonOff.onClick = () => {
+            buttonOff.gameObject.size = 0;
+            buttonOn.gameObject.size = 1;
+        }
+
+        let soundOnGo = soundContainer.CreateGameObject("sound_on_button");
+        let buttonOn = new UIButton(Skins.SoundOnButtonSkin);
+        soundOnGo.AddComponent(buttonOn);
+        buttonOn.onClick = () => {
+            buttonOff.gameObject.size = 1;
+            buttonOn.gameObject.size = 0;
+        }
+
+        soundOnGo.size = state ? 1:0;
+        soundOffGo.size = !state ? 1:0;
     }
 
     function AddPauseButton() {
@@ -118,6 +133,6 @@ export function CreateHUD(scene: Scene) {
 
     AddGoldWidget();
     AddPauseButton();
-    AddSoundOnButton();
+    AddSoundButton(true);
     AddFullScreenButton();
 }
