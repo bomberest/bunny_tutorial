@@ -1,11 +1,11 @@
-import {Application, Container, Ticker} from "pixi.js";
+import {Application, Container} from "pixi.js";
 import {RectTransform} from "./RectTransform";
 import {GameObject} from "./GameObject";
 import {GameObjectSystem} from "../Systems/GameObjectSystem";
-import {Component} from "./Component";
 import {ComponentSystem} from "../Systems/ComponentSystem";
 
 export class Scene extends GameObject {
+    static main: Scene;
     gameObjectSystem: GameObjectSystem = new GameObjectSystem();
     componentSystem: ComponentSystem = new ComponentSystem();
     stage: Container;

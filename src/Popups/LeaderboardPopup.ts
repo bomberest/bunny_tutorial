@@ -7,6 +7,7 @@ import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
 import {CreateBestScorePopup} from "./BestScorePopup";
 import {UIFragment} from "../Engine/UI/UIFragment";
+import {UIFragmentModel} from "../Engine/UI/UIFragmentModel";
 
 export class LeaderboardDataItem {
 
@@ -25,14 +26,14 @@ export class Leaderboard {
     }
 }
 
-export function CreateLeaderboardPopupUI(scene: Scene): UIFragment {
-    return scene
-        .CreateGameObject("leaderboard_popup")
-        .AddComponent(new LeaderboardPopup());
+export class LeaderboardModel {
+    constructor(public leaderboards: Leaderboard[]) {
+    }
 }
 
-export class LeaderboardPopup extends UIFragment {
-    leaderboards: Leaderboard[] = [
+export function CreateLeaderboardPopupUI(): UIFragment<UIFragmentModel> {
+
+    let leaderboards: Leaderboard[] = [
         new Leaderboard("All time", [
             new LeaderboardDataItem("PavelNikolaevich", 49444),
             new LeaderboardDataItem("Alex", 46822),
@@ -48,6 +49,18 @@ export class LeaderboardPopup extends UIFragment {
         new Leaderboard("Week", [new LeaderboardDataItem("Single", 1000)]),
         new Leaderboard("Month", [])
     ]
+
+    let model = new LeaderboardModel(leaderboards);
+
+    return Scene.main
+        .CreateGameObject("leaderboard_popup")
+        .AddComponent(new LeaderboardPopup(model));
+}
+
+export class LeaderboardPopup extends UIFragment<LeaderboardModel> {
+    constructor(model: LeaderboardModel) {
+        super(model);
+    }
 
     OnStart() {
         super.OnStart();
@@ -92,7 +105,7 @@ export class LeaderboardPopup extends UIFragment {
         this.timeouts.length = 0;
 
         if (leaderboard == null) {
-            leaderboard = this.leaderboards[this.currentLeaderboardIndex];
+            leaderboard = this.model.leaderboards[this.currentLeaderboardIndex];
         }
         this.leaderboardTitleText.text = leaderboard.name;
         let data = leaderboard.data;
@@ -222,7 +235,7 @@ export class LeaderboardPopup extends UIFragment {
                         button.onClick = (() => {
                             this.currentLeaderboardIndex--;
                             if (this.currentLeaderboardIndex < 0) {
-                                this.currentLeaderboardIndex = this.leaderboards.length - 1;
+                                this.currentLeaderboardIndex = this.model.leaderboards.length - 1;
                             }
 
                             this.RedrawList();
@@ -237,7 +250,7 @@ export class LeaderboardPopup extends UIFragment {
                     go.AddComponent(new UIButton(Skins.NextButtonSkin), button => {
                         button.onClick = () => {
                             this.currentLeaderboardIndex++;
-                            if (this.currentLeaderboardIndex == this.leaderboards.length) {
+                            if (this.currentLeaderboardIndex == this.model.leaderboards.length) {
                                 this.currentLeaderboardIndex = 0;
                             }
 
