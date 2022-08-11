@@ -31,7 +31,7 @@ export class LeaderboardModel {
     }
 }
 
-export function CreateLeaderboardPopupUI(): UIFragment<UIFragmentModel> {
+export function CreateLeaderboardPopupUI(): LeaderboardPopup {
 
     let leaderboards: Leaderboard[] = [
         new Leaderboard("All time", [
