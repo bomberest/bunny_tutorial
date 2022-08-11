@@ -61,20 +61,20 @@ export function CreateHUD(scene: Scene) {
         let buttonOff = new UIButton(Skins.SoundOffButtonSkin);
         soundOffGo.AddComponent(buttonOff);
         buttonOff.onClick = () => {
-            buttonOff.gameObject.size = 0;
-            buttonOn.gameObject.size = 1;
+            buttonOff.gameObject.scaleXY = 0;
+            buttonOn.gameObject.scaleXY = 1;
         }
 
         let soundOnGo = soundContainer.CreateGameObject("sound_on_button");
         let buttonOn = new UIButton(Skins.SoundOnButtonSkin);
         soundOnGo.AddComponent(buttonOn);
         buttonOn.onClick = () => {
-            buttonOff.gameObject.size = 1;
-            buttonOn.gameObject.size = 0;
+            buttonOff.gameObject.scaleXY = 1;
+            buttonOn.gameObject.scaleXY = 0;
         }
 
-        soundOnGo.size = state ? 1:0;
-        soundOffGo.size = !state ? 1:0;
+        soundOnGo.scaleXY = state ? 1:0;
+        soundOffGo.scaleXY = !state ? 1:0;
     }
 
     function AddPauseButton() {

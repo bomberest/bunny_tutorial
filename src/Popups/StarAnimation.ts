@@ -7,6 +7,7 @@ export class StarAnimation extends Component {
     }
 
     OnUpdate() {
+        
         super.OnUpdate();
 
 

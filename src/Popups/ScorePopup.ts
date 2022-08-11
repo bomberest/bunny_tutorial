@@ -6,10 +6,11 @@ import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
 import {CreateBestScorePopup} from "./BestScorePopup";
 import {StarAnimation} from "./StarAnimation";
+import {RotateAnimation} from "./RotateAnimation";
 
 function CreateStar(root: GameObject): GameObject {
 
-    let star = root.CreateGameObject("rays");
+    let star = root.CreateGameObject("star");
     let sprite = new UISprite('./assets/UI/star.png');
     star.AddComponent(sprite);
     let random = Math.random();
@@ -33,57 +34,55 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             popup.addChild(background);
             let sprite = new UISprite('./assets/UI/rays.png');
             background.AddComponent(sprite);
-            background.ticker.add((dt) => {
-                background.rotation += 0.01 * dt;
-            })
+            background.AddComponent(new RotateAnimation(0.005));
         }
         {
             {
                 let star = CreateStar(popup);
                 star.position.set(500, 400)
-                star.size = 1;
+                star.scaleXY = 1;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(500, 150)
-                star.size = 1;
+                star.scaleXY = 1;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(550, -100)
-                star.size = 1.5;
+                star.scaleXY = 1.5;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(500, -350)
-                star.size = 1;
+                star.scaleXY = 1;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(-500, 400)
-                star.size = 1;
+                star.scaleXY = 1;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(-500, 150)
-                star.size = 1.5;
+                star.scaleXY = 1.5;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(-500, -100)
-                star.size = 1;
+                star.scaleXY = 1;
             }
 
             {
                 let star = CreateStar(popup);
                 star.position.set(-500, -350)
-                star.size = 1;
+                star.scaleXY = 1;
             }
         }
 
@@ -95,8 +94,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
         }
         {
             {
-                let header = scene.CreateGameObject("background");
-                popup.addChild(header)
+                let header = popup.CreateGameObject("background");
                 let sprite = new UISprite('./assets/UI/header_info_plate.png');
                 header.AddComponent(sprite);
                 header.position.y -= 407;
@@ -119,8 +117,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             }
 
             {
-                let coin = scene.CreateGameObject("coin");
-                popup.addChild(coin)
+                let coin = popup.CreateGameObject("coin");
                 let sprite = new UISprite(Skins.CollectCoinIconSkin);
                 coin.AddComponent(sprite);
                 coin.position.set(-225, -70)
@@ -136,8 +133,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             }
 
             {
-                let coin = scene.CreateGameObject("flag");
-                popup.addChild(coin)
+                let coin = popup.CreateGameObject("flag");
                 let sprite = new UISprite(Skins.CollectDistanceIconSkin);
                 coin.AddComponent(sprite);
                 coin.position.set(-235, 110)
@@ -153,13 +149,15 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             }
 
             {
-                let go = scene.CreateGameObject("play_button");
-                popup.addChild(go);
+                let go = popup.CreateGameObject("play_button");
                 let button = new UIButton(Skins.OkButtonSkin);
                 button.onClick = () => {
-
-                    CreateBestScorePopup(go.scene);
                     popup.Destroy();
+                    CreateBestScorePopup(go.scene);
+
+                    let children = popup.GetChildrenRecursively();
+                    children.forEach(value => console.log(value.name));
+
                 }
                 go.AddComponent(button);
                 go.position.set(0, 365);

@@ -240,6 +240,10 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
             {
                 let go = popup.CreateGameObject("ok_button");
                 let button = new UIButton(Skins.OkButtonSkin);
+                button.onClick = ()=>{
+                    console.log("Destroy: " + popup.name);
+                    popup.Destroy();
+                }
                 go.AddComponent(button);
                 go.position.set(0, 370);
             }

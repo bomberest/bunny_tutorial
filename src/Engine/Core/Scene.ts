@@ -2,21 +2,27 @@ import {Application, Container, Ticker} from "pixi.js";
 import {RectTransform} from "./RectTransform";
 import {GameObject} from "./GameObject";
 import {GameObjectSystem} from "../Systems/GameObjectSystem";
+import {Component} from "./Component";
+import {ComponentSystem} from "../Systems/ComponentSystem";
 
 export class Scene extends GameObject {
-    system: GameObjectSystem = new GameObjectSystem();
+    gameObjectSystem: GameObjectSystem = new GameObjectSystem();
+    componentSystem: ComponentSystem = new ComponentSystem();
     stage: Container;
     rectTransform: RectTransform;
 
     constructor(name: string, public application: Application, private heightOrWidth: number = 1, private heightReference: number = 1024) {
         super(name);
+
+        this.scene = this;
         this.stage = application.stage;
 
         this.pivot.set(this.width / 2, this.height / 2);
         this.position.set(this.width / 2, this.height / 2);
 
         application.ticker.add(this.Update.bind(this));
-        this.system.OnUpdate.bind(this.system);
+        this.gameObjectSystem.OnUpdate.bind(this.gameObjectSystem);
+        this.componentSystem.OnUpdate.bind(this.componentSystem);
         application.stage.addChild(this);
 
         console.log("scene width: " + application.view.width + ", height: " + application.view.height);
@@ -42,14 +48,14 @@ export class Scene extends GameObject {
         rectTransform.RecalculateSize();
     }
 
-    CreateGameObject(name: string = "GameObject"): GameObject {
+    CreateGameObject(name: string = "GameObject", parent?: GameObject): GameObject {
         let go = new GameObject(name);
         go.scene = this;
         go.sortableChildren = true;
 
-        this.addChild(go);
+        (parent != null ? parent : this).addChild(go);
 
-        this.system.Add(go);
+        this.gameObjectSystem.Add(go);
 
         go.OnStart.bind(go);
         go.OnStart();
@@ -58,24 +64,23 @@ export class Scene extends GameObject {
     }
 
     DestroyGameObject(go: GameObject): void {
-        this.system.Remove(go);
-        go.OnDestroy.bind(go);
+        this.gameObjectSystem.Remove(go);
         go.OnDestroy();
-        go.visible = false;
         go.destroy();
     }
 
+
     Update(): void {
-        if (this.system != null) {
-            this.system.OnUpdate();
+        if (this.gameObjectSystem != null) {
+            this.gameObjectSystem.OnUpdate();
         }
     }
 
     Destroy(): void {
-        console.log("destroy scene, objects count: " + this.system.targets.length);
+        console.log("destroy scene, objects count: " + this.gameObjectSystem.targets.length);
 
-        while (this.system.targets.length > 0) {
-            let go = this.system.targets.pop();
+        while (this.gameObjectSystem.targets.length > 0) {
+            let go = this.gameObjectSystem.targets.pop();
             this.DestroyGameObject(go);
         }
 

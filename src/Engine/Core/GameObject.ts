@@ -36,25 +36,63 @@ export class GameObject extends Sprite implements ILifetime {
         return this.scene.application.ticker.deltaTime;
     }
 
-    get size(): number {
+    get scaleXY(): number {
         return this.scale.x;
     }
 
-    set size(value: number) {
+    set scaleXY(value: number) {
         this.scale.set(value, value);
+    }
+
+    get gameObjectChildren(): GameObject[] {
+        let array: GameObject[] = [];
+
+        this.children.forEach(child => {
+            if (child instanceof GameObject) {
+                array.push(child as GameObject);
+            }
+        })
+
+        return array;
     }
 
     OnStart(): void {
     }
 
     OnDestroy(): void {
-        this.components.forEach(value => value.OnDestroy());
-        this.components = [];
+        this.RemoveChildrenComponentsRecursively()
     }
 
     AddChild(child: DisplayObject): void {
         this.addChild(child)
         child.zIndex = this.zIndex + 1;
+    }
+
+    RemoveChildrenComponentsRecursively(): void {
+        let children = this.GetChildrenRecursively();
+
+        children.forEach(child => {
+            child.RemoveComponents();
+        })
+    }
+
+    ///Includes itself
+    GetChildrenRecursively(): GameObject[] {
+        let input: GameObject[] = [];
+        let output: GameObject[] = [];
+        input.push(this);
+
+        while (input.length > 0) {
+            let item: GameObject = input.pop();
+            output.push(item)
+            let children = item.gameObjectChildren;
+            if (children == null) {
+                continue;
+            }
+            input.push(...children);
+        }
+
+        return output;
     }
 
     RemoveChild(child: DisplayObject): void {
@@ -71,27 +109,34 @@ export class GameObject extends Sprite implements ILifetime {
         }
     }
 
-    AddComponent(target: Component): void {
-        this.components.push(target);
-        target.gameObject = this;
-        target.OnBind(target);
-        target.OnStart.bind(target);
-        target.OnStart();
-        target.OnUpdate.bind(target);
+    AddComponent(component: Component): void {
+        component.gameObject = this;
+        component.OnBind(component);
+        component.OnStart.bind(component);
+        component.OnUpdate.bind(component);
+        component.OnDestroy.bind(component);
+
+        this.components.push(component);
+
+        component.OnStart();
     }
 
-    RemoveComponent(target: Component): void {
-        target.OnDestroy.bind(target);
-        target.OnDestroy();
-        const index = this.components.indexOf(target, 0); //??
-        if (index > -1) {
-            this.components.splice(index, 1);
-        }
+    RemoveComponent(component: Component): void {
+        this.components.filter(component => {
+            return component == component;
+        });
+    }
+
+    RemoveComponents(): void {
+        this.components.forEach(value => {
+            value.OnDestroy();
+        });
+        this.components = [];
     }
 
     CreateGameObject(name: string = "GameObject"): GameObject {
-        let go = this.scene.CreateGameObject(name);
-        go.parent = this;
+        let go = this.scene.CreateGameObject(name, this);
+        this.AddChild(go);
         return go;
     }
 
