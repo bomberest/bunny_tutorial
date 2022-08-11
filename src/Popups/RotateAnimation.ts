@@ -10,6 +10,6 @@ export class RotateAnimation extends Component {
 
         super.OnUpdate();
 
-        this.gameObject.rotation += this.speed;
+        this.gameObject.rotation += this.speed * this.gameObject.deltaTime;
     }
 }
