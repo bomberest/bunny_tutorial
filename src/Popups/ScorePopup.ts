@@ -7,25 +7,48 @@ import {Scene} from "../Engine/Core/Scene";
 import {StarAnimation} from "./StarAnimation";
 import {RotateAnimation} from "./RotateAnimation";
 import {CreateBestScorePopupUI} from "./BestScorePopup";
+import {UIFragmentModel} from "../Engine/UI/UIFragmentModel";
+import {UIFragment} from "../Engine/UI/UIFragment";
 
-function CreateStar(root: GameObject): GameObject {
+export function CreateScorePopupUI(): ScorePopup {
+    let model = new ScorePopupModel(402, 6, 138, true);
 
-    let star = root.CreateGameObject("star");
-    let sprite = new UISprite('./assets/UI/star.png');
-    star.AddComponent(sprite);
-    let random = Math.random();
-    let s = 0.005;
-    let speed = random > 0.5 ? s : -s;
-    star.AddComponent(new StarAnimation(1.3, 1.2, 1.4, speed));
-
-    return star;
+    return Scene.main
+        .CreateGameObject("leaderboard_popup")
+        .AddComponent(new ScorePopup(model));
 }
 
-export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
-    {
+export class ScorePopupModel extends UIFragmentModel {
+    constructor(public score: number, public coins: number, public flags: number, public record: boolean) {
+        super();
+    }
+}
+
+export class ScorePopup extends UIFragment<ScorePopupModel> {
+    constructor(model: ScorePopupModel) {
+        super(model);
+    }
+
+    CreateStar(root: GameObject): GameObject {
+
+        let star = root.CreateGameObject("star");
+        let sprite = new UISprite('./assets/UI/star.png');
+        star.AddComponent(sprite);
+        let random = Math.random();
+        let s = 0.005;
+        let speed = random > 0.5 ? s : -s;
+        star.AddComponent(new StarAnimation(1.3, 1.2, 1.4, speed));
+
+        return star;
+    }
+
+    OnStart() {
+        super.OnStart();
+
+        let scene = this.gameObject.scene;
         let popup = scene.CreateGameObject("score_popup")
 
-        if (record) {
+        if (this.model.record) {
             popup.scale.set(0.75, 0.75);
         }
 
@@ -38,49 +61,49 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
         }
         {
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(500, 400)
                 star.scaleXY = 1;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(500, 150)
                 star.scaleXY = 1;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(550, -100)
                 star.scaleXY = 1.5;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(500, -350)
                 star.scaleXY = 1;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(-500, 400)
                 star.scaleXY = 1;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(-500, 150)
                 star.scaleXY = 1.5;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(-500, -100)
                 star.scaleXY = 1;
             }
 
             {
-                let star = CreateStar(popup);
+                let star = this.CreateStar(popup);
                 star.position.set(-500, -350)
                 star.scaleXY = 1;
             }
@@ -100,7 +123,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
                 header.position.y -= 407;
 
                 {
-                    let text = new PIXI.Text(record ? "New record:" : "Your records:", Skins.blueStyle(56));
+                    let text = new PIXI.Text(this.model.record ? "New record:" : "Your records:", Skins.blueStyle(56));
                     header.addChild(text);
                     text.zIndex = 1;
                     text.anchor.set(0.5, 0.5);
@@ -109,7 +132,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             }
 
             {
-                let text = new PIXI.Text("158", Skins.greenStyle(190));
+                let text = new PIXI.Text(this.model.score, Skins.greenStyle(190));
                 popup.addChild(text);
                 text.zIndex = 1;
                 text.anchor.set(0.5, 0.5);
@@ -125,7 +148,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             }
 
             {
-                let text = new PIXI.Text("6", Skins.goldStyle(100));
+                let text = new PIXI.Text(this.model.coins, Skins.goldStyle(100));
                 popup.addChild(text);
                 text.zIndex = 1;
                 text.anchor.set(0.5, 0.5);
@@ -141,7 +164,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
             }
 
             {
-                let text = new PIXI.Text("138 m", Skins.lightBlueStyle(100));
+                let text = new PIXI.Text(this.model.flags + " m", Skins.lightBlueStyle(100));
                 popup.addChild(text);
                 text.zIndex = 1;
                 text.anchor.set(0.5, 0.5);
@@ -163,7 +186,6 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
                 go.position.set(0, 365);
             }
         }
-
-        return popup;
     }
 }
+

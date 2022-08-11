@@ -2,7 +2,6 @@ const PIXI = require('pixi.js');
 import {Scene} from "./Engine/Core/Scene";
 import {CreateHUD} from "./Popups/HUD";
 import {CreateLeaderboardPopupUI} from "./Popups/LeaderboardPopup";
-import {CreateScorePopup} from "./Popups/ScorePopup";
 
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {
@@ -29,7 +28,5 @@ window.addEventListener("resize", function () {
 const scene = new Scene("scene", app, 1, 960);
 Scene.main = scene;
 
-let leaderboardPopup = CreateLeaderboardPopupUI();
-// let scorePopup = CreateScorePopup(Scene.main, false);
-// let bestScorePopup = CreateScorePopup(Scene.main, true);
+CreateLeaderboardPopupUI();
 CreateHUD(scene);

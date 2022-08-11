@@ -3,7 +3,7 @@ import * as Skins from "../Skins";
 import {UIButton} from "../Engine/UI/UIButton";
 import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
-import {CreateScorePopup} from "./ScorePopup";
+import {CreateScorePopupUI} from "./ScorePopup";
 import {UIFragmentModel} from "../Engine/UI/UIFragmentModel";
 import {UIFragment} from "../Engine/UI/UIFragment";
 import {CreateLeaderboardPopupUI} from "./LeaderboardPopup";
@@ -118,7 +118,7 @@ export class BestScorePopup extends UIFragment<BestScorePopupModel> {
                 let button = new UIButton(Skins.PlayButtonSkin);
                 button.onClick = () => {
                     popup.Destroy();
-                    CreateScorePopup(root, true);
+                    CreateScorePopupUI();
                 }
                 go.AddComponent(button);
                 go.position.set(160, 300);
