@@ -5,9 +5,9 @@ import {GameObject} from "../Engine/Core/GameObject";
 import {UIButton} from "../Engine/UI/UIButton";
 import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
-import {CreateBestScorePopup} from "./BestScorePopup";
 import {UIFragment} from "../Engine/UI/UIFragment";
 import {UIFragmentModel} from "../Engine/UI/UIFragmentModel";
+import {CreateBestScorePopupUI} from "./BestScorePopup";
 
 export class LeaderboardDataItem {
 
@@ -269,7 +269,7 @@ export class LeaderboardPopup extends UIFragment<LeaderboardModel> {
                     go.AddComponent(new UIButton(Skins.OkButtonSkin), button => {
                         button.onClick = () => {
                             root.Destroy();
-                            CreateBestScorePopup(root.scene);
+                            CreateBestScorePopupUI();
                         }
                     });
                     go.position.set(0, 370);

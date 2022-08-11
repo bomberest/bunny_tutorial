@@ -2,7 +2,6 @@ const PIXI = require('pixi.js');
 import {Scene} from "./Engine/Core/Scene";
 import {CreateHUD} from "./Popups/HUD";
 import {CreateLeaderboardPopupUI} from "./Popups/LeaderboardPopup";
-import {CreateBestScorePopup} from "./Popups/BestScorePopup";
 import {CreateScorePopup} from "./Popups/ScorePopup";
 
 let type = "WebGL";

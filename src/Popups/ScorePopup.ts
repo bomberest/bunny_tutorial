@@ -4,9 +4,9 @@ import {GameObject} from "../Engine/Core/GameObject";
 import {UIButton} from "../Engine/UI/UIButton";
 import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
-import {CreateBestScorePopup} from "./BestScorePopup";
 import {StarAnimation} from "./StarAnimation";
 import {RotateAnimation} from "./RotateAnimation";
+import {CreateBestScorePopupUI} from "./BestScorePopup";
 
 function CreateStar(root: GameObject): GameObject {
 
@@ -153,7 +153,7 @@ export function CreateScorePopup(scene: Scene, record: boolean): GameObject {
                 let button = new UIButton(Skins.OkButtonSkin);
                 button.onClick = () => {
                     popup.Destroy();
-                    CreateBestScorePopup(go.scene);
+                    CreateBestScorePopupUI();
 
                     let children = popup.GetChildrenRecursively();
                     children.forEach(value => console.log(value.name));
