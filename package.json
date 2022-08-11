@@ -30,6 +30,7 @@
   "main": "index.js",
   "private": "true",
   "dependencies": {
+    "pixi-timer": "^1.0.1",
     "pixi.js": "^6.5.1"
   },
   "scripts": {

@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+const PIXI = require('pixi.js');
 import {CreateBestScorePopup} from "./Popups/BestScorePopup";
 import {CreateHUD} from "./Popups/HUD";
 import {Scene} from "./Engine/Core/Scene";

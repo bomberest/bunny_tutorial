@@ -4,6 +4,8 @@ import {GameObject} from "../Engine/Core/GameObject";
 import {UIButton} from "../Engine/UI/UIButton";
 import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
+import {CreateLeaderboardPopup} from "./LeaderboardPopup";
+import {CreateScorePopup} from "./ScorePopup";
 
 export function CreateBestScorePopup(scene: Scene): GameObject {
     {
@@ -50,7 +52,7 @@ export function CreateBestScorePopup(scene: Scene): GameObject {
                 let go = scene.CreateGameObject("mi_button");
                 popup.addChild(go);
                 let button = new UIButton(Skins.MiButtonSkin);
-                button.onClick= ()=>{
+                button.onClick = () => {
                     window.open("https://mi.com/", '_blank').focus();
                 }
                 go.AddComponent(button);
@@ -80,6 +82,10 @@ export function CreateBestScorePopup(scene: Scene): GameObject {
                 let go = scene.CreateGameObject("leaderboard_button");
                 popup.addChild(go);
                 let button = new UIButton(Skins.LeaderboardButtonSkin);
+                button.onClick = () => {
+                    popup.Destroy();
+                    CreateLeaderboardPopup(scene);
+                }
                 go.AddComponent(button);
                 go.position.set(-160, 300);
             }
@@ -88,6 +94,10 @@ export function CreateBestScorePopup(scene: Scene): GameObject {
                 let go = scene.CreateGameObject("play_button");
                 popup.addChild(go);
                 let button = new UIButton(Skins.PlayButtonSkin);
+                button.onClick = () => {
+                    popup.Destroy();
+                    CreateScorePopup(scene, true);
+                }
                 go.AddComponent(button);
                 go.position.set(160, 300);
             }

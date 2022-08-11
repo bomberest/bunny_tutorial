@@ -1,13 +1,12 @@
 import * as PIXI from "pixi.js";
+import {Text} from "pixi.js";
 import * as Skins from "../Skins";
+import {MiddleLeaderCountBarSkin} from "../Skins";
 import {GameObject} from "../Engine/Core/GameObject";
 import {UIButton} from "../Engine/UI/UIButton";
 import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
 import {CreateBestScorePopup} from "./BestScorePopup";
-import {MiddleLeaderCountBarSkin} from "../Skins";
-import {RectTransform} from "../Engine/Core/RectTransform";
-import {Container, Text} from "pixi.js";
 
 export class LeaderboardDataItem {
 
@@ -24,6 +23,10 @@ export class LeaderboardItem {
 export class Leaderboard {
     constructor(public name: string, public data: LeaderboardDataItem[]) {
     }
+}
+
+export class LeaderboardPopup {
+
 }
 
 const leaderboards: Leaderboard[] = [
@@ -74,6 +77,12 @@ let list: LeaderboardItem[] = [];
 let timeouts: NodeJS.Timeout[] = [];
 
 function RedrawList(leaderboard?: Leaderboard) {
+    for (let i = 0; i < list.length; i++) {
+        clearTimeout(timeouts[i]);
+    }
+
+    timeouts.length = 0;
+
     if (leaderboard == null) {
         leaderboard = leaderboards[currentLeaderboardIndex];
     }
@@ -86,13 +95,13 @@ function RedrawList(leaderboard?: Leaderboard) {
         item.nameText.text = name;
         item.countText.text = count;
 
-        clearTimeout(timeouts[i]);
-        item.container.scale.set(0, 0);
-        let timeout = setTimeout(() => {
-            item.container.scale.set(1, 1);
+        item.container.visible = false;
+        console.log("timeouts i " + i);
+        timeouts[i] = setTimeout(() => {
+            item.container.visible = true;
         }, 200 + i * 80);
-        timeouts[i] = timeout;
     }
+    console.log("timeouts length " + timeouts.length);
 }
 
 function CreateList(root: GameObject) {
@@ -240,9 +249,10 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
             {
                 let go = popup.CreateGameObject("ok_button");
                 let button = new UIButton(Skins.OkButtonSkin);
-                button.onClick = ()=>{
+                button.onClick = () => {
                     console.log("Destroy: " + popup.name);
                     popup.Destroy();
+                    CreateBestScorePopup(scene);
                 }
                 go.AddComponent(button);
                 go.position.set(0, 370);
