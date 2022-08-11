@@ -73,8 +73,8 @@ export function CreateHUD(scene: Scene) {
             buttonOn.gameObject.scaleXY = 0;
         }
 
-        soundOnGo.scaleXY = state ? 1:0;
-        soundOffGo.scaleXY = !state ? 1:0;
+        soundOnGo.scaleXY = state ? 1 : 0;
+        soundOffGo.scaleXY = !state ? 1 : 0;
     }
 
     function AddPauseButton() {
@@ -82,6 +82,13 @@ export function CreateHUD(scene: Scene) {
         let button = new UIButton(Skins.PauseButtonSkin);
 
         go.AddComponent(button);
+        button.onClick = () => {
+            if (scene.application.ticker.speed >= 1) {
+                scene.application.ticker.speed = 0;
+            } else {
+                scene.application.ticker.speed = 1;
+            }
+        }
 
         let rectTransform = new RectTransform(120, 120, scene.rectTransform);
         rectTransform.anchor.set(1, 0);
@@ -91,7 +98,7 @@ export function CreateHUD(scene: Scene) {
     }
 
     function AddFullScreenButton() {
-        let go = scene.CreateGameObject("pause_button");
+        let go = scene.CreateGameObject("fullscreen_button");
         let button = new UIButton(Skins.FullscreenButtonSkin);
         button.onClick = toggleFullscreen;
 
