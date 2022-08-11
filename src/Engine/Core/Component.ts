@@ -5,10 +5,6 @@ export abstract class Component implements ILifetime {
     type: string;
     gameObject: GameObject;
 
-    GetType(): string {
-        throw new Error("Undefined type");
-    }
-
     OnBind<T extends Component>(component: T): void {
 
     }

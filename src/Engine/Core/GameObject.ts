@@ -99,17 +99,16 @@ export class GameObject extends Sprite implements ILifetime {
         this.removeChild(child)
     }
 
-    GetComponent<T extends Component>(type: string): T {
+    GetComponent<T extends Component>(callback: (component: Component) => boolean): T {
         for (let i = this.components.length - 1; i >= 0; i--) {
             let component = this.components[i];
-            let componentType = component.GetType();
-            if (componentType == type) {
+            if (callback(component)) {
                 return component as T;
             }
         }
     }
 
-    AddComponent(component: Component): void {
+    AddComponent<T extends Component>(component: T, callback?: (component: T) => void): T {
         component.gameObject = this;
         component.OnBind(component);
         component.OnStart.bind(component);
@@ -118,7 +117,13 @@ export class GameObject extends Sprite implements ILifetime {
 
         this.components.push(component);
 
+        if (callback != null) {
+            callback.bind(component);
+            callback(component);
+        }
         component.OnStart();
+
+        return component;
     }
 
     RemoveComponent(component: Component): void {

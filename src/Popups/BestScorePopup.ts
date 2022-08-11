@@ -4,8 +4,8 @@ import {GameObject} from "../Engine/Core/GameObject";
 import {UIButton} from "../Engine/UI/UIButton";
 import {UISprite} from "../Engine/UI/UISprite";
 import {Scene} from "../Engine/Core/Scene";
-import {CreateLeaderboardPopup} from "./LeaderboardPopup";
 import {CreateScorePopup} from "./ScorePopup";
+import {LeaderboardPopup} from "./LeaderboardPopup";
 
 export function CreateBestScorePopup(scene: Scene): GameObject {
     {
@@ -84,7 +84,7 @@ export function CreateBestScorePopup(scene: Scene): GameObject {
                 let button = new UIButton(Skins.LeaderboardButtonSkin);
                 button.onClick = () => {
                     popup.Destroy();
-                    CreateLeaderboardPopup(scene);
+                    //CreateBestScorePopup(scene);
                 }
                 go.AddComponent(button);
                 go.position.set(-160, 300);

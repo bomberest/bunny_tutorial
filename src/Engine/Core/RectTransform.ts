@@ -52,21 +52,12 @@ export class RectTransform extends Component {
             );
         }
 
-        this.gameObject.children.forEach(displayObject => {
-            if (!(displayObject instanceof GameObject)) {
+        this.gameObject.gameObjectChildren.forEach(go => {
+            let rectTransform = go.GetComponent<RectTransform>(component => component instanceof RectTransform);
+            if (rectTransform == null) {
                 return;
             }
-
-            let go = displayObject as GameObject;
-            if (go == null) {
-                return;
-            }
-
-            let childRectTransform = go.GetComponent<RectTransform>(RectTransform.name);
-            if (childRectTransform == null) {
-                return;
-            }
-            childRectTransform.RecalculateSize.bind(childRectTransform)();
+            rectTransform.RecalculateSize.bind(rectTransform)();
         })
 
         this.drawDebugView(this.gameObject);

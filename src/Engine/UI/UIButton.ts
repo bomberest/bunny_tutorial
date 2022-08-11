@@ -6,8 +6,4 @@ export class UIButton extends InteractableUIElement {
     constructor(skin?: InteractableSkinData) {
         super(skin);
     }
-
-    GetType(): string {
-        return UIButton.name;
-    }
 }
