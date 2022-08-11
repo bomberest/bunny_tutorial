@@ -26,11 +26,6 @@ export class Leaderboard {
     }
 }
 
-export class LeaderboardModel {
-    constructor(public leaderboards: Leaderboard[]) {
-    }
-}
-
 export function CreateLeaderboardPopupUI(): LeaderboardPopup {
 
     let leaderboards: Leaderboard[] = [
@@ -55,6 +50,12 @@ export function CreateLeaderboardPopupUI(): LeaderboardPopup {
     return Scene.main
         .CreateGameObject("leaderboard_popup")
         .AddComponent(new LeaderboardPopup(model));
+}
+
+export class LeaderboardModel extends UIFragmentModel {
+    constructor(public leaderboards: Leaderboard[]) {
+        super();
+    }
 }
 
 export class LeaderboardPopup extends UIFragment<LeaderboardModel> {
