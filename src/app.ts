@@ -29,7 +29,7 @@ window.addEventListener("resize", function () {
 
 const scene = new Scene("scene", app, 1, 960);
 
-// let leaderboardPopup = CreateLeaderboardPopup(scene);
-let scorePopup = CreateScorePopup(scene, false);
+let leaderboardPopup = CreateLeaderboardPopup(scene);
+// let scorePopup = CreateScorePopup(scene, false);
 //let bestScorePopup = CreateScorePopup(scene, true);
 CreateHUD(scene);

@@ -196,7 +196,7 @@ export function CreateLeaderboardPopup(scene: Scene): GameObject {
 
             {
                 leaderboardTitleText = new PIXI.Text("All time", Skins.orangeStyle(64));
-                scene.addChild(leaderboardTitleText); //bug
+                popup.AddChild(leaderboardTitleText); //bug
                 leaderboardTitleText.anchor.set(0.5, 0.5);
                 leaderboardTitleText.position.set(0, -310);
             }
