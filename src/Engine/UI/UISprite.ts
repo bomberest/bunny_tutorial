@@ -9,10 +9,6 @@ export class UISprite extends Component {
         super();
     }
 
-    GetType(): string {
-        return UISprite.name;
-    }
-
     OnStart() {
         super.OnStart();
         this.Load();
@@ -21,7 +17,7 @@ export class UISprite extends Component {
     OnDestroy() {
         super.OnDestroy();
 
-        this.gameObject.RemoveChild(this._sprite);
+        this.gameObject.removeChild(this._sprite);
     }
 
     private Load(): void {
